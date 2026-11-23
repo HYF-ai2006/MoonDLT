@@ -1,0 +1,10 @@
+{
+  "name": "moondlt-local-tools",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "validate": "python scripts/validate.py",
+    "inspect": "node scripts/moondlt.mjs inspect"
+  }
+}

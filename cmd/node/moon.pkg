@@ -1,0 +1,12 @@
+import {
+  "local/moondlt" @dlt,
+  "moonbitlang/core/string",
+}
+
+supported_targets = "js"
+
+options(
+  link: {
+    "js": { "exports": [ "inspect_file", "extract_file" ], "format": "esm" },
+  },
+)

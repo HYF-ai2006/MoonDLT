@@ -86,3 +86,31 @@ test "stream budgets, identifier keys, histogram bounds" {
     None,
   )
 }
+
+///|
+test "manually constructed invalid reception times fail before state changes" {
+  let invalid = {
+    ..sample_message(),
+    storage: Some({ seconds: 0U, microseconds: 1000000U, ecu: "E", }),
+  }
+  let tracker = ContinuityTracker::new()
+  assert_true(
+    try {
+      ignore(tracker.observe(invalid))
+      false
+    } catch {
+      _ => true
+    },
+  )
+  assert_eq(tracker.total_messages(), 0UL)
+  let histogram = TimeHistogram::new(1000UL)
+  assert_true(
+    try {
+      histogram.add(invalid)
+      false
+    } catch {
+      _ => true
+    },
+  )
+  assert_eq(histogram.buckets().length(), 0)
+}

@@ -362,10 +362,9 @@ pub fn Message::effective_ecu(self : Message) -> String? {
 }
 
 ///|
-pub fn Message::storage_microseconds(self : Message) -> UInt64? {
+pub fn Message::storage_microseconds(self : Message) -> UInt64? raise DltError {
   match self.storage {
-    Some(s) =>
-      Some(s.seconds.to_uint64() * 1000000UL + s.microseconds.to_uint64())
+    Some(s) => Some(s.time_microseconds())
     None => None
   }
 }
