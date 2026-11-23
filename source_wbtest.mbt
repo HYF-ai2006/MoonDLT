@@ -2,7 +2,7 @@
 test "range scanner reads metadata without payload and verifies selected entries" {
   let msg = sample_message()
   let bytes = encode_all([msg, msg][:])
-  let reads : Array[(UInt64, Int)] = []
+  let reads : Array[(UInt64, Int32)] = []
   let source = Source::new(bytes.length().to_uint64(), (offset, length) => {
     reads.push((offset, length))
     bytes[offset.to_int():offset.to_int() + length].to_owned()
@@ -10,11 +10,20 @@ test "range scanner reads metadata without payload and verifies selected entries
   let catalog = source.catalog()
   assert_eq(catalog.length(), 2)
   let mut total = 0
-  for (_, length) in reads { total += length }
+  for (_, length) in reads {
+    total += length
+  }
   assert_eq(total, 84)
   assert_eq(source.read_entry(catalog[1]), msg)
-  let forged = { ..catalog[0], payload_length: 0 }
-  assert_true(try { ignore(source.read_entry(forged)); false } catch { _ => true })
+  let forged = { ..catalog[0], payload_length: 0, }
+  assert_true(
+    try {
+      ignore(source.read_entry(forged))
+      false
+    } catch {
+      _ => true
+    },
+  )
 }
 
 ///|
@@ -22,7 +31,9 @@ test "64-bit offsets without allocating a large file" {
   let wire = encode(sample_message())
   let base = 0x100000000UL
   let source = Source::new(base + wire.length().to_uint64(), (offset, length) => {
-    guard offset >= base else { raise Invalid(0, "unexpected read before virtual recording") }
+    guard offset >= base else {
+      raise Invalid(0, "unexpected read before virtual recording")
+    }
     wire[(offset - base).to_int():(offset - base).to_int() + length].to_owned()
   })
   let cursor = SourceCursor::new(source, start=base)
@@ -36,9 +47,23 @@ test "64-bit offsets without allocating a large file" {
 test "short source callbacks and entry budget reject safely" {
   let bytes = encode(sample_message())
   let short = Source::new(100UL, (_, _) => b"x")
-  assert_true(try { ignore(short.catalog()); false } catch { _ => true })
+  assert_true(
+    try {
+      ignore(short.catalog())
+      false
+    } catch {
+      _ => true
+    },
+  )
   let source = Source::from_bytes(bytes)
-  assert_true(try { ignore(source.catalog(max_entries=0)); false } catch { _ => true })
+  assert_true(
+    try {
+      ignore(source.catalog(max_entries=0))
+      false
+    } catch {
+      _ => true
+    },
+  )
   assert_eq(source.verify(), 1UL)
   assert_eq(source.visit(_ => false), 1UL)
 }
