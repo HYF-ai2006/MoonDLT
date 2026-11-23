@@ -1,10 +1,10 @@
 ///|
 /// Stable categories, with byte offsets relative to the current message/input.
 pub(all) suberror DltError {
-  Invalid(Int, String)
-  Truncated(Int, String)
-  Unsupported(Int, String)
-  Limit(Int, String)
+  Invalid(Int32, String)
+  Truncated(Int32, String)
+  Unsupported(Int32, String)
+  Limit(Int32, String)
 }
 
 ///|
@@ -32,23 +32,28 @@ pub(all) enum Framing {
 
 ///|
 pub(all) struct Limits {
-  message_bytes : Int
-  buffered_bytes : Int
-  arguments : Int
-  string_bytes : Int
-  resync_bytes : Int
+  message_bytes : Int32
+  buffered_bytes : Int32
+  arguments : Int32
+  string_bytes : Int32
+  resync_bytes : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
 pub fn Limits::default() -> Limits {
-  { message_bytes: 65535, buffered_bytes: 262144, arguments: 255,
-    string_bytes: 65535, resync_bytes: 1048576 }
+  {
+    message_bytes: 65535,
+    buffered_bytes: 262144,
+    arguments: 255,
+    string_bytes: 65535,
+    resync_bytes: 1048576,
+  }
 }
 
 ///|
 pub(all) struct StorageHeader {
-  seconds : UInt
-  microseconds : UInt
+  seconds : UInt32
+  microseconds : UInt32
   ecu : String
 } derive(Eq, @debug.Debug)
 
@@ -57,9 +62,9 @@ pub(all) struct StorageHeader {
 /// subtype is the corresponding four-bit log level/trace/control code.
 pub(all) struct ExtendedHeader {
   verbose : Bool
-  message_type : Int
-  subtype : Int
-  argument_count : Int
+  message_type : Int32
+  subtype : Int32
+  argument_count : Int32
   application : String
   context : String
 } derive(Eq, @debug.Debug)
@@ -69,16 +74,23 @@ pub(all) struct ExtendedHeader {
 /// endian applies only to the payload type words and values.
 pub(all) struct Header {
   endian : Endian
-  counter : Int
+  counter : Int32
   ecu : String?
-  session : UInt?
-  timestamp : UInt?
+  session : UInt32?
+  timestamp : UInt32?
   extended : ExtendedHeader?
 } derive(Eq, @debug.Debug)
 
 ///|
-pub fn Header::new(counter? : Int = 0, endian? : Endian = Little) -> Header {
-  { endian, counter, ecu: None, session: None, timestamp: None, extended: None }
+pub fn Header::new(counter~ : Int32 = 0, endian~ : Endian = Little) -> Header {
+  {
+    endian,
+    counter,
+    ecu: None,
+    session: None,
+    timestamp: None,
+    extended: None,
+  }
 }
 
 ///|
@@ -90,15 +102,18 @@ pub(all) struct Message {
 } derive(Eq, @debug.Debug)
 
 ///|
-pub fn Message::new(header : Header, payload : Bytes,
-  storage? : StorageHeader) -> Message {
-  { storage, header, payload }
+pub fn Message::new(
+  header : Header,
+  payload : Bytes,
+  storage? : StorageHeader,
+) -> Message {
+  { storage, header, payload, }
 }
 
 ///|
 pub(all) struct Decoded {
   message : Message
-  consumed : Int
+  consumed : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -113,9 +128,9 @@ pub(all) enum TextEncoding {
 /// Widths are bits, integers accept 8/16/32/64, floating accepts 32/64.
 pub(all) enum Argument {
   Boolean(Bool)
-  Signed(Int, Int64)
-  Unsigned(Int, UInt64)
-  Floating(Int, Double)
+  Signed(Int32, Int64)
+  Unsigned(Int32, UInt64)
+  Floating(Int32, Double)
   Text(TextEncoding, String)
   Raw(Bytes)
 } derive(Eq, @debug.Debug)
@@ -123,13 +138,13 @@ pub(all) enum Argument {
 ///|
 pub(all) struct StreamBatch {
   messages : Array[Message]
-  skipped : Int
+  skipped : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
 pub(all) struct IndexEntry {
-  offset : Int
-  length : Int
+  offset : Int32
+  length : Int32
   storage : StorageHeader?
   header : Header
 } derive(Eq, @debug.Debug)
