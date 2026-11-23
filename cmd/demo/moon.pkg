@@ -1,0 +1,5 @@
+import {
+  "local/moondlt" @dlt,
+}
+
+pkgtype(kind: "executable")

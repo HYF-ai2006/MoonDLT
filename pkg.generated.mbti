@@ -1,0 +1,567 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "local/moondlt"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn build_index(BytesView, framing? : Framing, limits? : Limits, max_entries? : Int32) -> Array[IndexEntry] raise DltError
+
+pub fn control_request_message(ControlRequest, Header, storage? : StorageHeader) -> Message raise DltError
+
+pub fn control_response_message(ControlResponse, Header, storage? : StorageHeader) -> Message raise DltError
+
+pub fn copy_indexed(BytesView, ArrayView[IndexEntry], framing? : Framing, limits? : Limits, maximum_bytes? : Int32) -> Bytes raise DltError
+
+pub fn decode(BytesView, framing? : Framing, limits? : Limits) -> Decoded raise DltError
+
+pub fn decode_all(BytesView, framing? : Framing, limits? : Limits, max_messages? : Int32) -> Array[Message] raise DltError
+
+pub fn decode_arguments(BytesView, Int32, Endian, limits? : Limits) -> Array[Argument] raise DltError
+
+pub fn decode_control_request(BytesView, Endian) -> ControlRequest raise DltError
+
+pub fn decode_control_response(BytesView, Endian) -> ControlResponse raise DltError
+
+pub fn decode_exact(BytesView, framing? : Framing, limits? : Limits) -> Message raise DltError
+
+pub fn decode_parameters(BytesView, Int32, Endian, limits? : Limits) -> Array[VerboseParameter] raise DltError
+
+pub fn encode(Message, framing? : Framing, limits? : Limits) -> Bytes raise DltError
+
+pub fn encode_all(ArrayView[Message], framing? : Framing, limits? : Limits, max_bytes? : Int32) -> Bytes raise DltError
+
+pub fn encode_arguments(Array[Argument], Endian, limits? : Limits) -> Bytes raise DltError
+
+pub fn encode_control_request(ControlRequest, Endian) -> Bytes raise DltError
+
+pub fn encode_control_response(ControlResponse, Endian) -> Bytes raise DltError
+
+pub fn encode_messages(ArrayView[Message], framing? : Framing, limits? : Limits, maximum_bytes? : Int32) -> Bytes raise DltError
+
+pub fn encode_parameters(Array[VerboseParameter], Endian, limits? : Limits) -> Bytes raise DltError
+
+pub fn extract_indexed(BytesView, ArrayView[IndexEntry], framing? : Framing, limits? : Limits) -> Array[Message] raise DltError
+
+pub fn filter_messages(ArrayView[Message], Filter, limit? : Int32) -> Array[Message] raise DltError
+
+pub fn framing_name(Framing) -> String
+
+pub fn hex_decode(String) -> Bytes raise DltError
+
+pub fn hex_encode(BytesView) -> String
+
+pub fn merge_messages(ArrayView[Array[Message]], maximum_messages? : Int32) -> Array[Message] raise DltError
+
+pub fn parse_framing(String) -> Framing raise DltError
+
+pub fn query_expression(ArrayView[IndexEntry], FilterExpr, limit? : Int32, expression_limits? : ExpressionLimits) -> Array[IndexEntry] raise DltError
+
+pub fn query_index(ArrayView[IndexEntry], Filter, limit? : Int32) -> Array[IndexEntry] raise DltError
+
+pub fn software_version_response(String, Endian) -> ControlResponse raise DltError
+
+// Errors
+pub(all) suberror DltError {
+  Invalid(Int32, String)
+  Truncated(Int32, String)
+  Unsupported(Int32, String)
+  Limit(Int32, String)
+}
+pub fn DltError::describe(Self) -> String
+
+// Types and methods
+pub(all) enum Argument {
+  Boolean(Bool)
+  Signed(Int32, Int64)
+  Unsigned(Int32, UInt64)
+  Floating(Int32, Double)
+  Text(TextEncoding, String)
+  Raw(Bytes)
+} derive(Eq, @debug.Debug)
+pub fn Argument::as_bool(Self) -> Bool raise DltError
+pub fn Argument::as_double(Self, allow_lossy? : Bool) -> Double raise DltError
+pub fn Argument::as_int64(Self) -> Int64 raise DltError
+pub fn Argument::as_raw(Self) -> Bytes raise DltError
+pub fn Argument::as_text(Self) -> String raise DltError
+pub fn Argument::as_uint64(Self) -> UInt64 raise DltError
+pub fn Argument::from_json(Json, limits? : Limits) -> Self raise DltError
+pub fn Argument::to_json(Self) -> Json
+
+pub(all) struct ContinuityConfig {
+  max_streams : Int32
+  max_forward_gap : Int32
+  wrap_previous_min : UInt32
+  wrap_current_max : UInt32
+} derive(Eq, @debug.Debug)
+pub fn ContinuityConfig::default() -> Self
+
+pub(all) enum ContinuityEvent {
+  First
+  SessionChanged(UInt32?, UInt32?)
+  RepeatedCounter(Int32)
+  CounterGap(Int32, Int32, Int32)
+  CounterJump(Int32, Int32)
+  TimestampWrapped(UInt32, UInt32)
+  TimestampBackwards(UInt32, UInt32)
+  ReceptionBackwards(UInt64, UInt64)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ContinuityObservation {
+  key : StreamKey
+  events : Array[ContinuityEvent]
+  extended_timestamp : UInt64?
+  stream_messages : UInt64
+} derive(Eq, @debug.Debug)
+
+pub struct ContinuityTracker {
+  config : ContinuityConfig
+  states : Map[String, TimelineState]
+  order : Array[String]
+  mut total : UInt64
+}
+pub fn ContinuityTracker::new(config? : ContinuityConfig) -> Self raise DltError
+pub fn ContinuityTracker::observe(Self, Message) -> ContinuityObservation raise DltError
+pub fn ContinuityTracker::reset(Self) -> Unit
+pub fn ContinuityTracker::stream_count(Self) -> Int32
+pub fn ContinuityTracker::summaries(Self) -> Array[StreamSummary]
+pub fn ContinuityTracker::total_messages(Self) -> UInt64
+
+pub(all) enum ControlRequest {
+  SetLogLevel(String, String, Int32, String)
+  SetTraceStatus(String, String, Int32, String)
+  GetLogInfo(Int32, String, String, String)
+  GetDefaultLogLevel
+  StoreConfiguration
+  ResetConfiguration
+  SetDefaultLogLevel(Int32, String)
+  SetDefaultTraceStatus(Int32, String)
+  GetSoftwareVersion
+  Unknown(UInt32, Bytes)
+} derive(Eq, @debug.Debug)
+pub fn ControlRequest::service_id(Self) -> UInt32
+
+pub(all) struct ControlResponse {
+  service_id : UInt32
+  status : Int32
+  data : Bytes
+} derive(Eq, @debug.Debug)
+pub fn ControlResponse::default_log_level(Self) -> Int32 raise DltError
+pub fn ControlResponse::software_version(Self, Endian, maximum_bytes? : Int32) -> String raise DltError
+
+pub(all) struct Decoded {
+  message : Message
+  consumed : Int32
+} derive(Eq, @debug.Debug)
+
+pub struct Dictionary {
+  schemas : Array[NonVerboseSchema]
+  capacity : Int32
+  maximum_fields : Int32
+}
+pub fn Dictionary::contains(Self, SchemaKey) -> Bool
+pub fn Dictionary::decode(Self, Message) -> Array[NamedValue] raise DltError
+pub fn Dictionary::encode(Self, SchemaKey, ArrayView[NamedValue], Endian) -> Bytes raise DltError
+pub fn Dictionary::from_json(Json, capacity? : Int32, maximum_fields? : Int32) -> Self raise DltError
+pub fn Dictionary::length(Self) -> Int32
+pub fn Dictionary::lookup(Self, SchemaKey) -> NonVerboseSchema?
+pub fn Dictionary::new(capacity? : Int32, maximum_fields? : Int32) -> Self raise DltError
+pub fn Dictionary::register(Self, NonVerboseSchema) -> Unit raise DltError
+pub fn Dictionary::remove(Self, SchemaKey) -> Bool
+pub fn Dictionary::to_json(Self) -> Json
+
+pub(all) enum Endian {
+  Little
+  Big
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ExpressionLimits {
+  input_bytes : Int32
+  tokens : Int32
+  depth : Int32
+  nodes : Int32
+} derive(Eq, @debug.Debug)
+pub fn ExpressionLimits::default() -> Self
+
+pub(all) struct ExtendedHeader {
+  verbose : Bool
+  message_type : Int32
+  subtype : Int32
+  argument_count : Int32
+  application : String
+  context : String
+} derive(Eq, @debug.Debug)
+
+pub(all) enum FieldKind {
+  Flag
+  SignedInteger(Int32)
+  UnsignedInteger(Int32)
+  FloatNumber(Int32)
+  FixedText(TextEncoding, Int32)
+  FixedBytes(Int32)
+} derive(Eq, @debug.Debug)
+pub fn FieldKind::byte_width(Self) -> Int32 raise DltError
+
+pub(all) struct Filter {
+  ecus : Array[String]?
+  applications : Array[String]?
+  contexts : Array[String]?
+  message_types : Array[Int32]?
+  maximum_log_level : Int32?
+  minimum_time : UInt64?
+  maximum_time : UInt64?
+  verbose : Bool?
+} derive(Eq, @debug.Debug)
+pub fn Filter::all() -> Self
+pub fn Filter::matches(Self, Message) -> Bool raise DltError
+pub fn Filter::validate(Self) -> Unit raise DltError
+
+pub(all) enum FilterExpr {
+  Constant(Bool)
+  Compare(HeaderField, Relation, HeaderValue)
+  Conjunction(FilterExpr, FilterExpr)
+  Disjunction(FilterExpr, FilterExpr)
+  Negation(FilterExpr)
+} derive(Eq, @debug.Debug)
+pub fn FilterExpr::matches(Self, Message, limits? : ExpressionLimits) -> Bool raise DltError
+pub fn FilterExpr::parse(String, limits? : ExpressionLimits) -> Self raise DltError
+
+pub(all) struct FixedPoint {
+  quantization : Float
+  offset : Int64
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Framing {
+  Network
+  Storage
+  Serial
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Header {
+  endian : Endian
+  counter : Int32
+  ecu : String?
+  session : UInt32?
+  timestamp : UInt32?
+  extended : ExtendedHeader?
+} derive(Eq, @debug.Debug)
+pub fn Header::from_json(Json, limits? : Limits) -> Self raise DltError
+pub fn Header::new(counter? : Int32, endian? : Endian) -> Self
+pub fn Header::to_json(Self) -> Json
+pub fn Header::wire_size(Self) -> Int32
+
+pub(all) enum HeaderField {
+  Ecu
+  StorageEcu
+  Application
+  Context
+  MessageType
+  LogLevel
+  Counter
+  Session
+  Timestamp
+  WallTime
+  Verbosity
+} derive(Eq, @debug.Debug)
+
+pub(all) enum HeaderValue {
+  TextValue(String)
+  NumberValue(UInt64)
+  BoolValue(Bool)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct IndexEntry {
+  offset : Int32
+  length : Int32
+  storage : StorageHeader?
+  header : Header
+} derive(Eq, @debug.Debug)
+
+pub struct IndexedSource {
+  source : Source
+  catalog : SourceCatalog
+}
+pub fn IndexedSource::length(Self) -> Int32
+pub fn IndexedSource::query(Self, Filter, maximum? : Int32) -> Array[Int32] raise DltError
+pub fn IndexedSource::read(Self, Int32, limits? : Limits) -> Message raise DltError
+pub fn IndexedSource::select(Self, Filter, maximum? : Int32, payload_budget? : Int32, limits? : Limits) -> Array[Message] raise DltError
+pub fn IndexedSource::visit_range(Self, Int32, Int32, (Message) -> Bool raise DltError, limits? : Limits) -> Int32 raise DltError
+
+pub(all) struct Limits {
+  message_bytes : Int32
+  buffered_bytes : Int32
+  arguments : Int32
+  string_bytes : Int32
+  resync_bytes : Int32
+} derive(Eq, @debug.Debug)
+pub fn Limits::default() -> Self
+
+pub(all) struct Message {
+  storage : StorageHeader?
+  header : Header
+  payload : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Message::arguments(Self, limits? : Limits) -> Array[Argument] raise DltError
+pub fn Message::control_request(Self) -> ControlRequest raise DltError
+pub fn Message::control_response(Self) -> ControlResponse raise DltError
+pub fn Message::effective_ecu(Self) -> String?
+pub fn Message::from_json(Json, limits? : Limits) -> Self raise DltError
+pub fn Message::new(Header, Bytes, storage? : StorageHeader) -> Self
+pub fn Message::nonverbose_id(Self) -> UInt32 raise DltError
+pub fn Message::parameters(Self, limits? : Limits) -> Array[VerboseParameter] raise DltError
+pub fn Message::schema_key(Self) -> SchemaKey raise DltError
+pub fn Message::storage_microseconds(Self) -> UInt64? raise DltError
+pub fn Message::stream_key(Self) -> StreamKey
+pub fn Message::to_json(Self) -> Json
+pub fn Message::with_arguments(Header, Array[Argument], storage? : StorageHeader, limits? : Limits) -> Self raise DltError
+pub fn Message::with_parameters(Header, Array[VerboseParameter], storage? : StorageHeader, limits? : Limits) -> Self raise DltError
+
+pub(all) struct NamedValue {
+  name : String
+  unit : String?
+  value : Argument
+} derive(Eq, @debug.Debug)
+
+pub(all) struct NonVerboseSchema {
+  key : SchemaKey
+  fields : Array[SchemaField]
+} derive(Eq, @debug.Debug)
+pub fn NonVerboseSchema::payload_length(Self) -> Int32 raise DltError
+
+pub(all) enum NumericType {
+  Bool8
+  IntValue(Int32)
+  UIntValue(Int32)
+  FloatValue(Int32)
+} derive(Eq, @debug.Debug)
+
+pub(all) enum ParameterValue {
+  Scalar(Argument)
+  NumericArray(NumericType, Array[Int32], Array[Argument])
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Relation {
+  EqualTo
+  NotEqualTo
+  LessThan
+  LessOrEqual
+  GreaterThan
+  GreaterOrEqual
+} derive(Eq, @debug.Debug)
+
+pub(all) struct SchemaField {
+  name : String
+  kind : FieldKind
+  unit : String?
+} derive(Eq, @debug.Debug)
+
+pub(all) struct SchemaKey {
+  application : String
+  context : String
+  message_id : UInt32
+} derive(Eq, @debug.Debug)
+
+pub struct Source {
+  size : UInt64
+  read_at : (UInt64, Int32) -> Bytes raise DltError
+}
+pub fn Source::catalog(Self, framing? : Framing, limits? : Limits, max_entries? : Int32) -> Array[SourceEntry] raise DltError
+pub fn Source::copy_selected(Self, (SourceEntry) -> Bool, (Bytes) -> Unit raise DltError, framing? : Framing, limits? : Limits, max_entries? : UInt64) -> UInt64 raise DltError
+pub fn Source::from_bytes(Bytes) -> Self
+pub fn Source::new(UInt64, (UInt64, Int32) -> Bytes raise DltError) -> Self
+pub fn Source::read_entry(Self, SourceEntry, limits? : Limits) -> Message raise DltError
+pub fn Source::signature(Self, sample_bytes? : Int32) -> SourceSignature raise DltError
+pub fn Source::size(Self) -> UInt64
+pub fn Source::verify(Self, check? : (Message) -> Unit raise DltError, framing? : Framing, limits? : Limits, max_entries? : UInt64) -> UInt64 raise DltError
+pub fn Source::visit(Self, (SourceEntry) -> Bool raise DltError, framing? : Framing, limits? : Limits, max_entries? : UInt64) -> UInt64 raise DltError
+
+pub struct SourceCatalog {
+  signature : SourceSignature
+  framing : Framing
+  records : Array[SourceEntry]
+}
+pub fn SourceCatalog::build(Source, framing? : Framing, limits? : Limits, max_entries? : Int32, sample_bytes? : Int32) -> Self raise DltError
+pub fn SourceCatalog::containing(Self, UInt64) -> Int32?
+pub fn SourceCatalog::entry(Self, Int32) -> SourceEntry raise DltError
+pub fn SourceCatalog::from_json(Json, limits? : Limits, max_entries? : Int32) -> Self raise DltError
+pub fn SourceCatalog::length(Self) -> Int32
+pub fn SourceCatalog::open(Self, Source, limits? : Limits) -> IndexedSource raise DltError
+pub fn SourceCatalog::open_trusted(Self, Source) -> IndexedSource raise DltError
+pub fn SourceCatalog::query(Self, Filter, maximum? : Int32) -> Array[Int32] raise DltError
+pub fn SourceCatalog::source_signature(Self) -> SourceSignature
+pub fn SourceCatalog::to_json(Self) -> Json
+
+pub struct SourceCursor {
+  source : Source
+  framing : Framing
+  limits : Limits
+  max_entries : UInt64
+  mut offset : UInt64
+  mut count : UInt64
+  mut header_bytes_read : UInt64
+}
+pub fn SourceCursor::entry_count(Self) -> UInt64
+pub fn SourceCursor::header_bytes_read(Self) -> UInt64
+pub fn SourceCursor::new(Source, framing? : Framing, limits? : Limits, max_entries? : UInt64, start? : UInt64) -> Self raise DltError
+pub fn SourceCursor::next_entry(Self) -> SourceEntry? raise DltError
+pub fn SourceCursor::position(Self) -> UInt64
+
+pub(all) struct SourceEntry {
+  offset : UInt64
+  length : Int32
+  framing : Framing
+  storage : StorageHeader?
+  header : Header
+  payload_offset : UInt64
+  payload_length : Int32
+} derive(Eq, @debug.Debug)
+
+pub(all) struct SourceSignature {
+  size : UInt64
+  sample_bytes : Int32
+  head : UInt64
+  tail : UInt64
+} derive(Eq, @debug.Debug)
+
+pub(all) struct StorageHeader {
+  seconds : UInt32
+  microseconds : UInt32
+  ecu : String
+} derive(Eq, @debug.Debug)
+pub fn StorageHeader::time_microseconds(Self) -> UInt64 raise DltError
+
+pub(all) struct StreamBatch {
+  messages : Array[Message]
+  skipped : Int32
+} derive(Eq, @debug.Debug)
+
+pub struct StreamDecoder {
+  framing : Framing
+  limits : Limits
+  recover : Bool
+  mut pending : Bytes
+  mut total_input : UInt64
+  mut total_messages : UInt64
+  mut total_skipped : UInt64
+  mut consecutive_skipped : Int32
+  mut closed : Bool
+  mut failed : Bool
+}
+pub fn StreamDecoder::buffered_bytes(Self) -> Int32
+pub fn StreamDecoder::discard_tail(Self) -> Int32 raise DltError
+pub fn StreamDecoder::feed(Self, BytesView) -> StreamBatch raise DltError
+pub fn StreamDecoder::finish(Self) -> Unit raise DltError
+pub fn StreamDecoder::input_bytes(Self) -> UInt64
+pub fn StreamDecoder::is_failed(Self) -> Bool
+pub fn StreamDecoder::message_count(Self) -> UInt64
+pub fn StreamDecoder::new(framing? : Framing, limits? : Limits, recover? : Bool) -> Self raise DltError
+pub fn StreamDecoder::reset(Self) -> Unit
+pub fn StreamDecoder::skipped_bytes(Self) -> UInt64
+
+pub(all) struct StreamKey {
+  ecu : String
+  application : String
+  context : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct StreamSummary {
+  key : StreamKey
+  messages : UInt64
+  missing_counter_values : UInt64
+  repeated_counters : UInt64
+  counter_jumps : UInt64
+  clock_backwards : UInt64
+  timestamp_wraps : UInt64
+  last_counter : Int32
+  last_session : UInt32?
+  last_timestamp : UInt32?
+} derive(Eq, @debug.Debug)
+
+pub struct StreamTranscoder {
+  decoder : StreamDecoder
+  output : Framing
+  select : (Message) -> Bool
+  transform : (Message) -> Message raise DltError
+  emit : (Bytes) -> Unit raise DltError
+  mut emitted_messages : UInt64
+  mut emitted_bytes : UInt64
+  mut failed : Bool
+}
+pub fn StreamTranscoder::feed(Self, BytesView) -> Int32 raise DltError
+pub fn StreamTranscoder::finish(Self) -> Unit raise DltError
+pub fn StreamTranscoder::message_count(Self) -> UInt64
+pub fn StreamTranscoder::new(Framing, Framing, (Bytes) -> Unit raise DltError, select? : (Message) -> Bool, transform? : (Message) -> Message raise DltError, limits? : Limits) -> Self raise DltError
+pub fn StreamTranscoder::output_bytes(Self) -> UInt64
+
+pub(all) enum TextEncoding {
+  Ascii
+  Utf8
+} derive(Eq, @debug.Debug)
+
+pub(all) struct TimeBucket {
+  window : TimeWindow
+  messages : UInt64
+  payload_bytes : UInt64
+  min_counter : Int32
+  max_counter : Int32
+} derive(Eq, @debug.Debug)
+
+pub struct TimeHistogram {
+  origin : UInt64
+  width : UInt64
+  max_buckets : Int32
+  buckets : Map[UInt64, TimeBucket]
+}
+pub fn TimeHistogram::add(Self, Message) -> Unit raise DltError
+pub fn TimeHistogram::buckets(Self) -> Array[TimeBucket]
+pub fn TimeHistogram::clear(Self) -> Unit
+pub fn TimeHistogram::new(UInt64, origin? : UInt64, max_buckets? : Int32) -> Self raise DltError
+
+pub(all) struct TimeWindow {
+  start : UInt64
+  end : UInt64
+} derive(Eq, @debug.Debug)
+pub fn TimeWindow::contains(Self, UInt64) -> Bool
+pub fn TimeWindow::intersect(Self, Self) -> Self?
+pub fn TimeWindow::new(UInt64, UInt64) -> Self raise DltError
+
+type TimelineState
+
+pub(all) struct VariableInfo {
+  name : String
+  unit : String?
+} derive(Eq, @debug.Debug)
+
+pub(all) struct VerboseParameter {
+  value : ParameterValue
+  variable : VariableInfo?
+  scaling : FixedPoint?
+} derive(Eq, @debug.Debug)
+pub fn VerboseParameter::array(NumericType, Array[Int32], Array[Argument], variable? : VariableInfo, scaling? : FixedPoint) -> Self
+pub fn VerboseParameter::at(Self, Array[Int32], limits? : Limits) -> Argument raise DltError
+pub fn VerboseParameter::from_json(Json, limits? : Limits) -> Self raise DltError
+pub fn VerboseParameter::logical_values(Self) -> Array[Double] raise DltError
+pub fn VerboseParameter::reshape(Self, Array[Int32], limits? : Limits) -> Self raise DltError
+pub fn VerboseParameter::scalar(Argument, variable? : VariableInfo, scaling? : FixedPoint) -> Self
+pub fn VerboseParameter::section(Self, Array[Int32], Array[Int32], steps? : Array[Int32], limits? : Limits) -> Self raise DltError
+pub fn VerboseParameter::to_json(Self) -> Json
+
+pub struct WindowSource {
+  backing : Source
+  window_bytes : Int32
+  mut start : UInt64
+  mut window : Bytes
+  mut reads : UInt64
+  mut hits : UInt64
+}
+pub fn WindowSource::as_source(Self) -> Source
+pub fn WindowSource::backing_reads(Self) -> UInt64
+pub fn WindowSource::cache_hits(Self) -> UInt64
+pub fn WindowSource::invalidate(Self) -> Unit
+pub fn WindowSource::new(Source, window_bytes? : Int32) -> Self raise DltError
+pub fn WindowSource::read(Self, UInt64, Int32) -> Bytes raise DltError
+
+// Type aliases
+
+// Traits

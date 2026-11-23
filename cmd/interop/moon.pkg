@@ -1,0 +1,6 @@
+import {
+  "local/moondlt" @dlt,
+  "moonbitlang/core/env",
+}
+
+pkgtype(kind: "executable")

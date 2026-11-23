@@ -1,0 +1,343 @@
+{
+  "recorded_at": "2026-11-23T23:37:05.444038+08:00",
+  "scope": "Local validation only; no remote repository, contest submission or Mooncakes publication",
+  "platform": "Windows",
+  "node": "v24.22.3",
+  "toolchain": "moon 0.1.20261021 (a4f8933 2026-10-21) ~\\.moon\\bin\\moon.exe\nmoonc v0.10.17+093cb8f9c (2026-10-21) \\\\?\\C:\\Users\\11619\\.moon\\bin\\moonc.exe\nmoonrun 0.1.20261021 (a4f8933 2026-10-21) \\\\?\\C:\\Users\\11619\\.moon\\bin\\moonrun.exe\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
+  "checks": [
+    {
+      "name": "format",
+      "command": [
+        "moon",
+        "fmt",
+        "--check"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "compile_all",
+      "command": [
+        "moon",
+        "check",
+        "--target",
+        "all",
+        "--deny-warn"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "test_wasm",
+      "command": [
+        "moon",
+        "test",
+        "--target",
+        "wasm",
+        "--deny-warn"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "tests": {
+        "total": 44,
+        "passed": 44,
+        "failed": 0
+      }
+    },
+    {
+      "name": "test_wasm_gc",
+      "command": [
+        "moon",
+        "test",
+        "--target",
+        "wasm-gc",
+        "--deny-warn"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "tests": {
+        "total": 44,
+        "passed": 44,
+        "failed": 0
+      }
+    },
+    {
+      "name": "test_js",
+      "command": [
+        "moon",
+        "test",
+        "--target",
+        "js",
+        "--deny-warn"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "tests": {
+        "total": 44,
+        "passed": 44,
+        "failed": 0
+      }
+    },
+    {
+      "name": "demo",
+      "command": [
+        "moon",
+        "run",
+        "cmd/demo",
+        "--target",
+        "js",
+        "--deny-warn"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "interfaces",
+      "command": [
+        "moon",
+        "info"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "source_scale",
+      "command": [
+        "C:\\Users\\11619\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "scripts/count_loc.py",
+        "--minimum",
+        "4000"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "independent_interop",
+      "command": [
+        "C:\\Users\\11619\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "scripts/interop.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "file_cli",
+      "command": [
+        "C:\\Users\\11619\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "scripts/test_file_cli.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "test_native",
+      "status": "NOT_RUN",
+      "reason": "Windows MSVC C++ compiler/linker and SDK are unavailable in this environment"
+    }
+  ],
+  "source_scale": {
+    "method": "Handwritten .mbt only, comments/blank removed; strict also removes punctuation-only lines",
+    "excluded": [
+      ".git",
+      ".mooncakes",
+      "_build",
+      "node_modules",
+      "target",
+      "work"
+    ],
+    "totals": {
+      "core": {
+        "physical": 6100,
+        "code_nonblank": 5358,
+        "effective_strict": 4198
+      },
+      "tests": {
+        "physical": 1676,
+        "code_nonblank": 1585,
+        "effective_strict": 1240
+      },
+      "examples_and_tools": {
+        "physical": 447,
+        "code_nonblank": 404,
+        "effective_strict": 312
+      }
+    },
+    "files": {
+      "core": [
+        {
+          "path": "bytes.mbt",
+          "physical": 186,
+          "code_nonblank": 160,
+          "effective_strict": 123
+        },
+        {
+          "path": "catalog.mbt",
+          "physical": 354,
+          "code_nonblank": 301,
+          "effective_strict": 240
+        },
+        {
+          "path": "codec.mbt",
+          "physical": 370,
+          "code_nonblank": 333,
+          "effective_strict": 259
+        },
+        {
+          "path": "control.mbt",
+          "physical": 387,
+          "code_nonblank": 342,
+          "effective_strict": 268
+        },
+        {
+          "path": "dictionary.mbt",
+          "physical": 695,
+          "code_nonblank": 621,
+          "effective_strict": 467
+        },
+        {
+          "path": "message_json.mbt",
+          "physical": 218,
+          "code_nonblank": 191,
+          "effective_strict": 142
+        },
+        {
+          "path": "query.mbt",
+          "physical": 1015,
+          "code_nonblank": 910,
+          "effective_strict": 726
+        },
+        {
+          "path": "source.mbt",
+          "physical": 363,
+          "code_nonblank": 300,
+          "effective_strict": 243
+        },
+        {
+          "path": "stream.mbt",
+          "physical": 339,
+          "code_nonblank": 287,
+          "effective_strict": 225
+        },
+        {
+          "path": "timeline.mbt",
+          "physical": 406,
+          "code_nonblank": 348,
+          "effective_strict": 284
+        },
+        {
+          "path": "types.mbt",
+          "physical": 150,
+          "code_nonblank": 108,
+          "effective_strict": 98
+        },
+        {
+          "path": "verbose.mbt",
+          "physical": 428,
+          "code_nonblank": 388,
+          "effective_strict": 299
+        },
+        {
+          "path": "verbose_json.mbt",
+          "physical": 364,
+          "code_nonblank": 336,
+          "effective_strict": 248
+        },
+        {
+          "path": "verbose_parameters.mbt",
+          "physical": 591,
+          "code_nonblank": 527,
+          "effective_strict": 422
+        },
+        {
+          "path": "verbose_selection.mbt",
+          "physical": 234,
+          "code_nonblank": 206,
+          "effective_strict": 154
+        }
+      ],
+      "tests": [
+        {
+          "path": "catalog_security_wbtest.mbt",
+          "physical": 66,
+          "code_nonblank": 61,
+          "effective_strict": 48
+        },
+        {
+          "path": "catalog_wbtest.mbt",
+          "physical": 104,
+          "code_nonblank": 99,
+          "effective_strict": 77
+        },
+        {
+          "path": "codec_wbtest.mbt",
+          "physical": 195,
+          "code_nonblank": 182,
+          "effective_strict": 145
+        },
+        {
+          "path": "expression_wbtest.mbt",
+          "physical": 104,
+          "code_nonblank": 99,
+          "effective_strict": 74
+        },
+        {
+          "path": "payload_wbtest.mbt",
+          "physical": 401,
+          "code_nonblank": 384,
+          "effective_strict": 294
+        },
+        {
+          "path": "robustness_wbtest.mbt",
+          "physical": 169,
+          "code_nonblank": 160,
+          "effective_strict": 127
+        },
+        {
+          "path": "source_wbtest.mbt",
+          "physical": 85,
+          "code_nonblank": 78,
+          "effective_strict": 64
+        },
+        {
+          "path": "timeline_wbtest.mbt",
+          "physical": 116,
+          "code_nonblank": 109,
+          "effective_strict": 89
+        },
+        {
+          "path": "tools_wbtest.mbt",
+          "physical": 436,
+          "code_nonblank": 413,
+          "effective_strict": 322
+        }
+      ],
+      "examples_and_tools": [
+        {
+          "path": "cmd/demo/main.mbt",
+          "physical": 69,
+          "code_nonblank": 64,
+          "effective_strict": 51
+        },
+        {
+          "path": "cmd/interop/main.mbt",
+          "physical": 238,
+          "code_nonblank": 223,
+          "effective_strict": 170
+        },
+        {
+          "path": "cmd/node/main.mbt",
+          "physical": 140,
+          "code_nonblank": 117,
+          "effective_strict": 91
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Advanced VARI/FIXP/array types have standard-derived unit tests, not independent pydlt interoperability evidence",
+    "The 54 external vectors cover the common v1 scalar profile, not complete AUTOSAR certification",
+    "No real vehicle hardware or production fleet log corpus was used",
+    "Remote CI configuration has not been executed on a hosting service"
+  ],
+  "result": "PASS_WITH_LIMITATIONS"
+}

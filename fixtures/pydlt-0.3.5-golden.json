@@ -1,0 +1,1963 @@
+{
+  "schema": "moondlt-interop-v1",
+  "producer": "pydlt",
+  "producer_version": "0.3.5",
+  "cases": [
+    {
+      "case": 0,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355313d0000b545435532ffffffff1234567841114150500043545831110000000111000000002100000080220000000080230000000000008024000000000000000000008041000000ff42000000ffff43000000ffffffff44000000ffffffffffffffff83000000000054c184000000000000000000c03f000200000c0074656d706572617475726500008200000e00e58f91e58aa8e69cbaf09f9982000002000001000000040000060000ff444c5401000400000000",
+      "sha256": "9c183b7a64461926613a220c27bb907b97ccee5b3a7a8cdfc7a4ef46e9c5bfbd",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "little",
+        "counter": 0,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 17,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "110000000111000000002100000080220000000080230000000000008024000000000000000000008041000000ff42000000ffff43000000ffffffff44000000ffffffffffffffff83000000000054c184000000000000000000c03f000200000c0074656d706572617475726500008200000e00e58f91e58aa8e69cbaf09f9982000002000001000000040000060000ff444c5401000400000000",
+        "arguments": [
+          {
+            "kind": "bool",
+            "value": true
+          },
+          {
+            "kind": "bool",
+            "value": false
+          },
+          {
+            "kind": "signed",
+            "width": 8,
+            "value": "-128"
+          },
+          {
+            "kind": "signed",
+            "width": 16,
+            "value": "-32768"
+          },
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-2147483648"
+          },
+          {
+            "kind": "signed",
+            "width": 64,
+            "value": "-9223372036854775808"
+          },
+          {
+            "kind": "unsigned",
+            "width": 8,
+            "value": "255"
+          },
+          {
+            "kind": "unsigned",
+            "width": 16,
+            "value": "65535"
+          },
+          {
+            "kind": "unsigned",
+            "width": 32,
+            "value": "4294967295"
+          },
+          {
+            "kind": "unsigned",
+            "width": 64,
+            "value": "18446744073709551615"
+          },
+          {
+            "kind": "float",
+            "width": 32,
+            "value": -13.25
+          },
+          {
+            "kind": "float",
+            "width": 64,
+            "value": 0.125
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "temperature"
+          },
+          {
+            "kind": "string",
+            "encoding": "utf8",
+            "value": "发动机🙂"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": ""
+          },
+          {
+            "kind": "raw",
+            "value": "00ff444c5401"
+          },
+          {
+            "kind": "raw",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "case": 0,
+      "framing": "network",
+      "hex": "3d0000b545435532ffffffff1234567841114150500043545831110000000111000000002100000080220000000080230000000000008024000000000000000000008041000000ff42000000ffff43000000ffffffff44000000ffffffffffffffff83000000000054c184000000000000000000c03f000200000c0074656d706572617475726500008200000e00e58f91e58aa8e69cbaf09f9982000002000001000000040000060000ff444c5401000400000000",
+      "sha256": "162579585601d1e647e29a3d5d041e93434cec913befe3231959c557053fa1d3",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 0,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 17,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "110000000111000000002100000080220000000080230000000000008024000000000000000000008041000000ff42000000ffff43000000ffffffff44000000ffffffffffffffff83000000000054c184000000000000000000c03f000200000c0074656d706572617475726500008200000e00e58f91e58aa8e69cbaf09f9982000002000001000000040000060000ff444c5401000400000000",
+        "arguments": [
+          {
+            "kind": "bool",
+            "value": true
+          },
+          {
+            "kind": "bool",
+            "value": false
+          },
+          {
+            "kind": "signed",
+            "width": 8,
+            "value": "-128"
+          },
+          {
+            "kind": "signed",
+            "width": 16,
+            "value": "-32768"
+          },
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-2147483648"
+          },
+          {
+            "kind": "signed",
+            "width": 64,
+            "value": "-9223372036854775808"
+          },
+          {
+            "kind": "unsigned",
+            "width": 8,
+            "value": "255"
+          },
+          {
+            "kind": "unsigned",
+            "width": 16,
+            "value": "65535"
+          },
+          {
+            "kind": "unsigned",
+            "width": 32,
+            "value": "4294967295"
+          },
+          {
+            "kind": "unsigned",
+            "width": 64,
+            "value": "18446744073709551615"
+          },
+          {
+            "kind": "float",
+            "width": 32,
+            "value": -13.25
+          },
+          {
+            "kind": "float",
+            "width": 64,
+            "value": 0.125
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "temperature"
+          },
+          {
+            "kind": "string",
+            "encoding": "utf8",
+            "value": "发动机🙂"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": ""
+          },
+          {
+            "kind": "raw",
+            "value": "00ff444c5401"
+          },
+          {
+            "kind": "raw",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "case": 0,
+      "framing": "serial",
+      "hex": "444c53013d0000b545435532ffffffff1234567841114150500043545831110000000111000000002100000080220000000080230000000000008024000000000000000000008041000000ff42000000ffff43000000ffffffff44000000ffffffffffffffff83000000000054c184000000000000000000c03f000200000c0074656d706572617475726500008200000e00e58f91e58aa8e69cbaf09f9982000002000001000000040000060000ff444c5401000400000000",
+      "sha256": "4a991f59d0266e2998d91373dad209b3a1cf3cc534c1f9725a17ba4f4d6c5cdd",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 0,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 17,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "110000000111000000002100000080220000000080230000000000008024000000000000000000008041000000ff42000000ffff43000000ffffffff44000000ffffffffffffffff83000000000054c184000000000000000000c03f000200000c0074656d706572617475726500008200000e00e58f91e58aa8e69cbaf09f9982000002000001000000040000060000ff444c5401000400000000",
+        "arguments": [
+          {
+            "kind": "bool",
+            "value": true
+          },
+          {
+            "kind": "bool",
+            "value": false
+          },
+          {
+            "kind": "signed",
+            "width": 8,
+            "value": "-128"
+          },
+          {
+            "kind": "signed",
+            "width": 16,
+            "value": "-32768"
+          },
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-2147483648"
+          },
+          {
+            "kind": "signed",
+            "width": 64,
+            "value": "-9223372036854775808"
+          },
+          {
+            "kind": "unsigned",
+            "width": 8,
+            "value": "255"
+          },
+          {
+            "kind": "unsigned",
+            "width": 16,
+            "value": "65535"
+          },
+          {
+            "kind": "unsigned",
+            "width": 32,
+            "value": "4294967295"
+          },
+          {
+            "kind": "unsigned",
+            "width": 64,
+            "value": "18446744073709551615"
+          },
+          {
+            "kind": "float",
+            "width": 32,
+            "value": -13.25
+          },
+          {
+            "kind": "float",
+            "width": 64,
+            "value": 0.125
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "temperature"
+          },
+          {
+            "kind": "string",
+            "encoding": "utf8",
+            "value": "发动机🙂"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": ""
+          },
+          {
+            "kind": "raw",
+            "value": "00ff444c5401"
+          },
+          {
+            "kind": "raw",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "case": 1,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355313fff00b545435532ffffffff1234567841114150500043545831000000110100000011000000002180000000228000000000238000000000000024800000000000000000000041ff00000042ffff00000043ffffffff00000044ffffffffffffffff00000083c1540000000000843fc000000000000000000200000c74656d70657261747572650000008200000ee58f91e58aa8e69cbaf09f9982000000020000010000000400000600ff444c5401000004000000",
+      "sha256": "34f8496be08d7254c38e94697b463e14413c049ad059ab30d60e62a81f64998a",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "big",
+        "counter": 255,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 17,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "000000110100000011000000002180000000228000000000238000000000000024800000000000000000000041ff00000042ffff00000043ffffffff00000044ffffffffffffffff00000083c1540000000000843fc000000000000000000200000c74656d70657261747572650000008200000ee58f91e58aa8e69cbaf09f9982000000020000010000000400000600ff444c5401000004000000",
+        "arguments": [
+          {
+            "kind": "bool",
+            "value": true
+          },
+          {
+            "kind": "bool",
+            "value": false
+          },
+          {
+            "kind": "signed",
+            "width": 8,
+            "value": "-128"
+          },
+          {
+            "kind": "signed",
+            "width": 16,
+            "value": "-32768"
+          },
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-2147483648"
+          },
+          {
+            "kind": "signed",
+            "width": 64,
+            "value": "-9223372036854775808"
+          },
+          {
+            "kind": "unsigned",
+            "width": 8,
+            "value": "255"
+          },
+          {
+            "kind": "unsigned",
+            "width": 16,
+            "value": "65535"
+          },
+          {
+            "kind": "unsigned",
+            "width": 32,
+            "value": "4294967295"
+          },
+          {
+            "kind": "unsigned",
+            "width": 64,
+            "value": "18446744073709551615"
+          },
+          {
+            "kind": "float",
+            "width": 32,
+            "value": -13.25
+          },
+          {
+            "kind": "float",
+            "width": 64,
+            "value": 0.125
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "temperature"
+          },
+          {
+            "kind": "string",
+            "encoding": "utf8",
+            "value": "发动机🙂"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": ""
+          },
+          {
+            "kind": "raw",
+            "value": "00ff444c5401"
+          },
+          {
+            "kind": "raw",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "case": 1,
+      "framing": "network",
+      "hex": "3fff00b545435532ffffffff1234567841114150500043545831000000110100000011000000002180000000228000000000238000000000000024800000000000000000000041ff00000042ffff00000043ffffffff00000044ffffffffffffffff00000083c1540000000000843fc000000000000000000200000c74656d70657261747572650000008200000ee58f91e58aa8e69cbaf09f9982000000020000010000000400000600ff444c5401000004000000",
+      "sha256": "af46a4091fbe135e9d6957d36b698b4f520794c339524ff51585844212fda29f",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 255,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 17,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "000000110100000011000000002180000000228000000000238000000000000024800000000000000000000041ff00000042ffff00000043ffffffff00000044ffffffffffffffff00000083c1540000000000843fc000000000000000000200000c74656d70657261747572650000008200000ee58f91e58aa8e69cbaf09f9982000000020000010000000400000600ff444c5401000004000000",
+        "arguments": [
+          {
+            "kind": "bool",
+            "value": true
+          },
+          {
+            "kind": "bool",
+            "value": false
+          },
+          {
+            "kind": "signed",
+            "width": 8,
+            "value": "-128"
+          },
+          {
+            "kind": "signed",
+            "width": 16,
+            "value": "-32768"
+          },
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-2147483648"
+          },
+          {
+            "kind": "signed",
+            "width": 64,
+            "value": "-9223372036854775808"
+          },
+          {
+            "kind": "unsigned",
+            "width": 8,
+            "value": "255"
+          },
+          {
+            "kind": "unsigned",
+            "width": 16,
+            "value": "65535"
+          },
+          {
+            "kind": "unsigned",
+            "width": 32,
+            "value": "4294967295"
+          },
+          {
+            "kind": "unsigned",
+            "width": 64,
+            "value": "18446744073709551615"
+          },
+          {
+            "kind": "float",
+            "width": 32,
+            "value": -13.25
+          },
+          {
+            "kind": "float",
+            "width": 64,
+            "value": 0.125
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "temperature"
+          },
+          {
+            "kind": "string",
+            "encoding": "utf8",
+            "value": "发动机🙂"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": ""
+          },
+          {
+            "kind": "raw",
+            "value": "00ff444c5401"
+          },
+          {
+            "kind": "raw",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "case": 1,
+      "framing": "serial",
+      "hex": "444c53013fff00b545435532ffffffff1234567841114150500043545831000000110100000011000000002180000000228000000000238000000000000024800000000000000000000041ff00000042ffff00000043ffffffff00000044ffffffffffffffff00000083c1540000000000843fc000000000000000000200000c74656d70657261747572650000008200000ee58f91e58aa8e69cbaf09f9982000000020000010000000400000600ff444c5401000004000000",
+      "sha256": "835c97b02f19af534540b8a8fd86ce7f446ff6caa54f4151653909decd80bdd9",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 255,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 17,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "000000110100000011000000002180000000228000000000238000000000000024800000000000000000000041ff00000042ffff00000043ffffffff00000044ffffffffffffffff00000083c1540000000000843fc000000000000000000200000c74656d70657261747572650000008200000ee58f91e58aa8e69cbaf09f9982000000020000010000000400000600ff444c5401000004000000",
+        "arguments": [
+          {
+            "kind": "bool",
+            "value": true
+          },
+          {
+            "kind": "bool",
+            "value": false
+          },
+          {
+            "kind": "signed",
+            "width": 8,
+            "value": "-128"
+          },
+          {
+            "kind": "signed",
+            "width": 16,
+            "value": "-32768"
+          },
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-2147483648"
+          },
+          {
+            "kind": "signed",
+            "width": 64,
+            "value": "-9223372036854775808"
+          },
+          {
+            "kind": "unsigned",
+            "width": 8,
+            "value": "255"
+          },
+          {
+            "kind": "unsigned",
+            "width": 16,
+            "value": "65535"
+          },
+          {
+            "kind": "unsigned",
+            "width": 32,
+            "value": "4294967295"
+          },
+          {
+            "kind": "unsigned",
+            "width": 64,
+            "value": "18446744073709551615"
+          },
+          {
+            "kind": "float",
+            "width": 32,
+            "value": -13.25
+          },
+          {
+            "kind": "float",
+            "width": 64,
+            "value": 0.125
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "temperature"
+          },
+          {
+            "kind": "string",
+            "encoding": "utf8",
+            "value": "发动机🙂"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": ""
+          },
+          {
+            "kind": "raw",
+            "value": "00ff444c5401"
+          },
+          {
+            "kind": "raw",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "case": 2,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355312002000b7856341200ff7f",
+      "sha256": "27ac83df56b4e56c02991f8c305a9839f16caca81e2b4deda469c7abca4c710e",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "little",
+        "counter": 2,
+        "ecu": null,
+        "session": null,
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 2,
+      "framing": "network",
+      "hex": "2002000b7856341200ff7f",
+      "sha256": "aefc282a6efb5c6f4e9ceaaba1a9b07350ab54f68450b131dc7292a8b4e9fb0b",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 2,
+        "ecu": null,
+        "session": null,
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 2,
+      "framing": "serial",
+      "hex": "444c53012002000b7856341200ff7f",
+      "sha256": "741269420aedd3097b21d69a7d39f2cc387e7b95dcac4fac4194efc787680caf",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 2,
+        "ecu": null,
+        "session": null,
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 3,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355312603000f454355321234567800ff7f",
+      "sha256": "fd74719e9b8d804378445375a65a5c8563336d24e77dec49a03976672360b44c",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "big",
+        "counter": 3,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 3,
+      "framing": "network",
+      "hex": "2603000f454355321234567800ff7f",
+      "sha256": "90045b64cd610ffc59d9707841d25f2b4a6486a1b6ebf3be69c90e09e2240959",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 3,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 3,
+      "framing": "serial",
+      "hex": "444c53012603000f454355321234567800ff7f",
+      "sha256": "775745a84e8eec5e735ec1c99045ee17d244b3701fdf4ba0faa8269994eefa70",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 3,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 4,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355312804000fffffffff7856341200ff7f",
+      "sha256": "68fb7df3cf4a11eefc2cdd60c509ff4ff4830cfbd2560e31520da1cb16857280",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "little",
+        "counter": 4,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 4,
+      "framing": "network",
+      "hex": "2804000fffffffff7856341200ff7f",
+      "sha256": "3b84e699743fafd33167315ba31b689de37eeed3961f05db6d1afabb680a214d",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 4,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 4,
+      "framing": "serial",
+      "hex": "444c53012804000fffffffff7856341200ff7f",
+      "sha256": "a0323d8b20ec8cdf8f29a35608bb1e7e55abd3422724869c499684466bd65c74",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 4,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 5,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355312e05001345435532ffffffff1234567800ff7f",
+      "sha256": "0d52cf9c2ec24074932afd9d68e89069a0bbe096c86f3a404260ecc129629414",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "big",
+        "counter": 5,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 5,
+      "framing": "network",
+      "hex": "2e05001345435532ffffffff1234567800ff7f",
+      "sha256": "97087bef77a645e08543f8bcae78d3acddb5ce7300987c029c06057909c82bec",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 5,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 5,
+      "framing": "serial",
+      "hex": "444c53012e05001345435532ffffffff1234567800ff7f",
+      "sha256": "d5206d1469d074568114c44cfbf05153f97108f9ed5088ca07c27773bd306134",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 5,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 6,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355313006000f123456787856341200ff7f",
+      "sha256": "be2d8a3cb4476fefbf68d39cf883c07158ccba238a055984cac41ad38d2c045d",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "little",
+        "counter": 6,
+        "ecu": null,
+        "session": null,
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 6,
+      "framing": "network",
+      "hex": "3006000f123456787856341200ff7f",
+      "sha256": "f5ed9c174c0e9a56b2ab2f64ad2733b700597b5b1995d3ab302c81fce97775af",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 6,
+        "ecu": null,
+        "session": null,
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 6,
+      "framing": "serial",
+      "hex": "444c53013006000f123456787856341200ff7f",
+      "sha256": "bc12ac14ae85cc9eef13f377c1122586e2ad895b8bbc0da8aea691169ed7f774",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 6,
+        "ecu": null,
+        "session": null,
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 7,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355313607001345435532123456781234567800ff7f",
+      "sha256": "106909320734a91af5f97fb9f0be9a0b6ca387af212a119552b6b43729b6241e",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "big",
+        "counter": 7,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 7,
+      "framing": "network",
+      "hex": "3607001345435532123456781234567800ff7f",
+      "sha256": "8dde28c87e1cc9cbad82651a39a2431017208d4710be0309e004ca69a43a3a7a",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 7,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 7,
+      "framing": "serial",
+      "hex": "444c53013607001345435532123456781234567800ff7f",
+      "sha256": "a88ff5aedfd27a4cee6bdff6529fefc7bfc6b571e625b1ca41682aa1ea0eb61f",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 7,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 8,
+      "framing": "storage",
+      "hex": "444c540100f1536540e201004543553138080013ffffffff123456787856341200ff7f",
+      "sha256": "14db808a84d5352e76ae41f06c4a276a4d97e2e8a2e9a46e81b35813575f996e",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "little",
+        "counter": 8,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 8,
+      "framing": "network",
+      "hex": "38080013ffffffff123456787856341200ff7f",
+      "sha256": "8324a77edd74a70aeb68b7c0acb72a708f2b40b5407e7ce3610aac9cdfe577dd",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 8,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 8,
+      "framing": "serial",
+      "hex": "444c530138080013ffffffff123456787856341200ff7f",
+      "sha256": "2c3ac391d82469295f5d9ada904568a9e68f621f4e9549d797a9d1729ab71a60",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 8,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "7856341200ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 9,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355313e09001745435532ffffffff123456781234567800ff7f",
+      "sha256": "7fd52a36df91873b5d170a23ba5cfcaa18f30d7e56eef7cac09041ccd7dd45dd",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "big",
+        "counter": 9,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 9,
+      "framing": "network",
+      "hex": "3e09001745435532ffffffff123456781234567800ff7f",
+      "sha256": "52cadece2c2a3f61601bf91575eaf9d8d0e0929d9e971f8bde4d7d3217307d9f",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 9,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 9,
+      "framing": "serial",
+      "hex": "444c53013e09001745435532ffffffff123456781234567800ff7f",
+      "sha256": "33069b96cf22bc54f00b989c2db812d66aec653c1dd3f9e92c44cad9bb6ef418",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 9,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": null,
+        "payload_hex": "1234567800ff7f",
+        "arguments": null
+      }
+    },
+    {
+      "case": 10,
+      "framing": "storage",
+      "hex": "444c540100f1536540e2010045435531210a002f4102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "a38808991c0b95e6b078d162856276c0c0bedcb767fec0fbd68e29c7ee7bf4e9",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "little",
+        "counter": 10,
+        "ecu": null,
+        "session": null,
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 10,
+      "framing": "network",
+      "hex": "210a002f4102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "05f41d33ab0961f3f383d4cdf8048e328184d0975cf248216914cfe62ade2404",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 10,
+        "ecu": null,
+        "session": null,
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 10,
+      "framing": "serial",
+      "hex": "444c5301210a002f4102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "6c2d29df38bb2730a68fb898b026f43d1def70794cbaeca98004222050e0a8da",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 10,
+        "ecu": null,
+        "session": null,
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 11,
+      "framing": "storage",
+      "hex": "444c540100f1536540e2010045435531270b0033454355324102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "485148b7c700dd5ff3f716fba9ac53927ea3b672c55019b0435d6b352cff293d",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "big",
+        "counter": 11,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 11,
+      "framing": "network",
+      "hex": "270b0033454355324102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "cee0a52e9de8de6ad91d1d5bddc810b5d5e588d13ec0d8085efa8962868f802e",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 11,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 11,
+      "framing": "serial",
+      "hex": "444c5301270b0033454355324102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "5f8ae332d846f33951e80fca34d2f9e9b7d8bfb5c14ad7c0028a77e30dc66f2f",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 11,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 12,
+      "framing": "storage",
+      "hex": "444c540100f1536540e2010045435531290c0033ffffffff4102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "77f2cbc1e9516847e0eac641652cb2ecec9d9f49f59b67e56c9b56f1e91d11cb",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "little",
+        "counter": 12,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 12,
+      "framing": "network",
+      "hex": "290c0033ffffffff4102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "2a284575797e34906f9aa93e73234a21b3ebfc24d2509679d452032f9741e6fa",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 12,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 12,
+      "framing": "serial",
+      "hex": "444c5301290c0033ffffffff4102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "45d6306e9b99fef84bdb91fdc107a2c0026abe1c6afe9c62a2513c726b720d97",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 12,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 13,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355312f0d003745435532ffffffff4102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "4c9c8d9e80618d3368a64cd9d9b9497c6f9fc7fa5ed8216bc5bd06dd4b027fcd",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "big",
+        "counter": 13,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 13,
+      "framing": "network",
+      "hex": "2f0d003745435532ffffffff4102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "70597b5f3f9d37bed87dd2361b161db2ca38e50aa4c9b85ac651226d1a5856fe",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 13,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 13,
+      "framing": "serial",
+      "hex": "444c53012f0d003745435532ffffffff4102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "d66ad9f828d09530169a4836ae9cda487e6ad8642035d6dec3436fad933711dc",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 13,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": null,
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 14,
+      "framing": "storage",
+      "hex": "444c540100f1536540e2010045435531310e0033123456784102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "192c9851915ac39b258db2acfc326fd3d27c6c02d8fae59c7d0c56e56cd14e09",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "little",
+        "counter": 14,
+        "ecu": null,
+        "session": null,
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 14,
+      "framing": "network",
+      "hex": "310e0033123456784102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "6d7c1885fc797413c9cff38e26dd99250929f6d71667d8366a4db3b59ca894a8",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 14,
+        "ecu": null,
+        "session": null,
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 14,
+      "framing": "serial",
+      "hex": "444c5301310e0033123456784102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "19bd6f7433e3e4a06f6085da330de8411e6a1b750383f68d1890a08da8b83a99",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 14,
+        "ecu": null,
+        "session": null,
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 15,
+      "framing": "storage",
+      "hex": "444c540100f1536540e2010045435531370f003745435532123456784102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "d5a09a78d444aa89ef8016303b8d601c0ba3c3b37d4345f0068ad3663fdbde77",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "big",
+        "counter": 15,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 15,
+      "framing": "network",
+      "hex": "370f003745435532123456784102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "220e2fa64569d979db1dff34ed9eff2a274cf3e25ef160d53ed103b2b2a5a67e",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 15,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 15,
+      "framing": "serial",
+      "hex": "444c5301370f003745435532123456784102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "0bbf59ab246742e1c841e65cf59506ef72329989f731b11bc10e507c7fd32492",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 15,
+        "ecu": "ECU2",
+        "session": null,
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 16,
+      "framing": "storage",
+      "hex": "444c540100f1536540e201004543553139100037ffffffff123456784102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "1c6d72481074a1adc9e2db8f6541a8bdd79161f6f9557d0243969112e09410cb",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "little",
+        "counter": 16,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 16,
+      "framing": "network",
+      "hex": "39100037ffffffff123456784102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "f13160335f397dcb1386d452999213731f090f195f77b96a78d34fdf8407958a",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 16,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 16,
+      "framing": "serial",
+      "hex": "444c530139100037ffffffff123456784102415050004354583123000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+      "sha256": "10721e9bfd456989160a0e212a4010d46bd10be06fa049d81f33e34f37c58bb3",
+      "expected": {
+        "storage": null,
+        "endian": "little",
+        "counter": 16,
+        "ecu": null,
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "23000000d6ffffff0002000013006865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 17,
+      "framing": "storage",
+      "hex": "444c540100f1536540e20100454355313f11003b45435532ffffffff123456784102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "88e47c0d8a99353ca86f413dac282b786236ed449768ff1ebc77886dd68fd70c",
+      "expected": {
+        "storage": {
+          "seconds": "1700000000",
+          "microseconds": "123456",
+          "ecu": "ECU1"
+        },
+        "endian": "big",
+        "counter": 17,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 17,
+      "framing": "network",
+      "hex": "3f11003b45435532ffffffff123456784102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "e23a5942875f1f17a4e361ededf74b89e0f5499f1162524ff69fc490956cb3fc",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 17,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    },
+    {
+      "case": 17,
+      "framing": "serial",
+      "hex": "444c53013f11003b45435532ffffffff123456784102415050004354583100000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+      "sha256": "e029b5bd39d8ece1b5c0480acc8811362c694aac442ab75200c2608035518450",
+      "expected": {
+        "storage": null,
+        "endian": "big",
+        "counter": 17,
+        "ecu": "ECU2",
+        "session": "4294967295",
+        "timestamp": "305419896",
+        "extended": {
+          "verbose": true,
+          "message_type": 0,
+          "subtype": 4,
+          "argument_count": 2,
+          "application": "APP",
+          "context": "CTX1"
+        },
+        "payload_hex": "00000023ffffffd60000020000136865616465722d636f6d62696e6174696f6e00",
+        "arguments": [
+          {
+            "kind": "signed",
+            "width": 32,
+            "value": "-42"
+          },
+          {
+            "kind": "string",
+            "encoding": "ascii",
+            "value": "header-combination"
+          }
+        ]
+      }
+    }
+  ]
+}
