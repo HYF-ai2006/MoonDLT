@@ -1,0 +1,104 @@
+{
+  "repository": "https://github.com/HYF-ai2006/MoonDLT",
+  "run_id": 45334151970,
+  "url": "https://github.com/HYF-ai2006/MoonDLT/actions/runs/45334151970",
+  "validated_commit": "aad913513736007fa93bb1a8c42036c00423af35",
+  "branch": "main",
+  "conclusion": "success",
+  "started_at_utc": "2026-11-24T05:33:32Z",
+  "completed_at_utc": "2026-11-24T05:34:06Z",
+  "toolchain_and_core": "0.10.17+093cb8f9c",
+  "runner": "ubuntu-latest",
+  "jobs": [
+    {
+      "name": "moonbit",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run hustcer/setup-moonbit@v1",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Record toolchain",
+          "conclusion": "success"
+        },
+        {
+          "name": "Formatting",
+          "conclusion": "success"
+        },
+        {
+          "name": "Compile all targets",
+          "conclusion": "success"
+        },
+        {
+          "name": "Test all targets",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run ingestion example",
+          "conclusion": "success"
+        },
+        {
+          "name": "Review generated API",
+          "conclusion": "success"
+        },
+        {
+          "name": "Core source metric",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install independent oracle locally",
+          "conclusion": "success"
+        },
+        {
+          "name": "Bidirectional interoperability",
+          "conclusion": "success"
+        },
+        {
+          "name": "Seeded independent typed reconstruction",
+          "conclusion": "success"
+        },
+        {
+          "name": "Optimized runtime tests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Actual file consumer",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

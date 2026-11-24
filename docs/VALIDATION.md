@@ -20,7 +20,7 @@ python scripts/test_file_cli.py
 
 这些命令是复现入口。测试总数、核心有效代码行数和各目标最终通过状态应以实际运行记录为准，不从计划功能推导通过结论。最终本地汇总记录位于 `docs/LOCAL_VALIDATION.json`（由最后一轮验证生成）。
 
-2026-11-23 的全目标静态检查已通过，Wasm、Wasm-GC、JavaScript 测试已有通过记录；测试数仍会随最后的边界用例增加。Windows 原生测试已经尝试，但本机缺少 MSVC 原生构建工具，因而未完成原生链接与运行验证。具备原生 C 工具链后可执行 `moon test --target native --deny-warn`。CI 的 Ubuntu `--target all` 仍保留原生构建和运行要求；其云端结果尚未执行。
+本地全目标静态检查、Wasm/Wasm-GC/JS 三目标各 56 项测试和 Wasm/JS Release 测试已通过。Windows 原生测试因本机缺少 MSVC 未完成；另已在 Ubuntu CI 中通过 `moon test --target all --deny-warn`，包含 Linux Native。固定工具链及全部步骤结果见 [CI 运行](https://github.com/HYF-ai2006/MoonDLT/actions/runs/45334151970) 和 `CI_VALIDATION.json`，不将 Linux 的结果解释为 Windows 原生运行通过。
 
 ## 已运行的独立互操作
 
@@ -50,13 +50,13 @@ python scripts/test_file_cli.py
 
 目录测试还需区分“不合法 JSON”“结构合法但篡改了头元数据”“源实际头变化”与“未采样载荷变化”：默认打开逐头比较可拒绝前几类元数据不匹配，但非密码学采样签名不提供载荷完整性证明。表达式测试检查优先级、字段类型、缺失值、超长平面组合与深层括号，避免把只通过小例子当作资源边界已验证。
 
-CI 保存标准检查入口，并执行独立互操作。当前为本地工程，云端 workflow 文件尚未在远程执行，不能把“已配置 CI”写为“云端 CI 已通过”。
+CI 已在公开 GitHub 仓库实际执行并通过标准检查、跨目标运行测试和独立互操作。编译器和 core 固定为 `0.10.17+093cb8f9c`；CI 证据绑定具体提交，后续修改仍需重新执行。
 
 ## 真实文件入口验证
 
 `scripts/test_file_cli.py` 把提交的独立 `.dlt` 黄金文件交给真实 Node 文件适配器。头扫描应得到 18 条记录，限制返回 2 条摘要时仍统计全部匹配；读取使用文件范围回调，头扫描单次最大请求仅 22 字节。按 APID 选择后，输出逐字节与独立黄金 JSON 指定的原始记录拼接一致。还验证非法表达式、截断输入、无效上限、相同输入输出路径和已有输出文件保护。
 
-本机已尝试运行全目标测试；Windows 原生链接因缺少 MSVC C++ 编译器与 SDK 无法启动，不能作为通过项。全目标静态检查与 Wasm/Wasm-GC/JS 的运行结果分别记录。CI 的 Linux 原生检查尚待未来推送后实际执行。
+本机全目标运行曾受缺少 MSVC 阻断，该 Windows 原生项继续保留为未验证；Linux 原生检查已由公开 CI 实际通过。本地和远程结果分别保存，避免混淆运行平台。
 
 ## 固定随机种子的独立类型重构
 

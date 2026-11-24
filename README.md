@@ -2,6 +2,8 @@
 
 MoonDLT 是以 MoonBit 实现的 **DLT v1 二进制日志编解码与流处理库**。它让运行在 Wasm、JavaScript 和原生环境中的工具读取 ECU 应用日志，提取带类型的参数，并将选中的记录按标准格式交给其他 DLT 工具。
 
+[GitHub CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml) · [Mooncakes 0.1.0](https://mooncakes.io/docs/HYF-ai2006/moondlt)
+
 核心面向已经产生的 `.dlt` 文件和 DLT 消息字节流，采用明确的长度、参数数目和缓存上限。读取器不依赖 libdlt、C/C++ FFI、车辆硬件或常驻守护进程。
 
 维护者为 [HYF-ai2006](https://github.com/HYF-ai2006)，项目仓库为 [HYF-ai2006/MoonDLT](https://github.com/HYF-ai2006/MoonDLT)，Mooncakes 包名为 `HYF-ai2006/moondlt`。参赛说明见 [PROPOSAL.md](PROPOSAL.md)，功能差异证据见 [docs/DIFFERENTIATION.md](docs/DIFFERENTIATION.md)，实际发布及 CI 状态见 [docs/SUBMISSION_STATUS.md](docs/SUBMISSION_STATUS.md)。
