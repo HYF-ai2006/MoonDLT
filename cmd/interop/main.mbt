@@ -194,7 +194,31 @@ fn perform(
       }
       message_json(decoded.message)
     }
+    "roundtrip" => {
+      let bytes = @dlt.hex_decode(value)
+      let message = @dlt.decode_exact(bytes[:], framing~)
+      // Rebuild the typed values rather than merely copying the original bytes.
+      let rebuilt = match message.header.extended {
+        Some({ verbose: true, .. }) =>
+          match message.storage {
+            Some(storage) =>
+              @dlt.Message::with_arguments(
+                message.header,
+                message.arguments(),
+                storage~,
+              )
+            None =>
+              @dlt.Message::with_arguments(message.header, message.arguments())
+          }
+        _ => message
+      }
+      let encoded = @dlt.encode(rebuilt, framing~)
+      { "hex": @dlt.hex_encode(encoded[:]), "message": message_json(rebuilt) }
+    }
     "encode" => {
+      guard value.length() >= 1 && value.length() <= 2 else {
+        raise @dlt.DltError::Invalid(0, "case id outside 0..17")
+      }
       let mut case_id = 0
       for character in value {
         guard character >= '0' && character <= '9' else {
@@ -218,13 +242,17 @@ fn main {
   let arguments = @env.args()
   let mut start = -1
   for i in 0..<arguments.length() {
-    if arguments[i] == "decode" || arguments[i] == "encode" {
+    if arguments[i] == "decode" ||
+      arguments[i] == "encode" ||
+      arguments[i] == "roundtrip" {
       start = i
       break
     }
   }
   if start < 0 {
-    println("Usage: interop decode|encode storage|network|serial HEX|CASE_ID")
+    println(
+      "Usage: interop decode|encode|roundtrip storage|network|serial HEX|CASE_ID",
+    )
   } else {
     let result = perform(arguments, start) catch {
       error => {

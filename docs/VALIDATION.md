@@ -2,7 +2,7 @@
 
 ## 本地命令
 
-完整记录入口：`python scripts/validate.py`，生成 `docs/LOCAL_VALIDATION.json`，每项命令的完整日志保存在忽略的 `work/validation/`。记录会区分实际通过、失败和环境缺失导致的未运行。
+完整记录入口：`python scripts/validate.py --release-tests`，生成 `docs/LOCAL_VALIDATION.json` 和相应 Markdown 摘要，每项命令的完整日志保存在忽略的 `work/validation/`。记录会区分实际通过、失败和环境缺失导致的未运行。
 
 ```sh
 moon check --target all --deny-warn
@@ -14,6 +14,7 @@ moon info
 moon run cmd/demo --target js
 python scripts/count_loc.py
 python scripts/interop.py
+python scripts/test_interop_random.py
 python scripts/test_file_cli.py
 ```
 
@@ -56,3 +57,9 @@ CI 保存标准检查入口，并执行独立互操作。当前为本地工程�
 `scripts/test_file_cli.py` 把提交的独立 `.dlt` 黄金文件交给真实 Node 文件适配器。头扫描应得到 18 条记录，限制返回 2 条摘要时仍统计全部匹配；读取使用文件范围回调，头扫描单次最大请求仅 22 字节。按 APID 选择后，输出逐字节与独立黄金 JSON 指定的原始记录拼接一致。还验证非法表达式、截断输入、无效上限、相同输入输出路径和已有输出文件保护。
 
 本机已尝试运行全目标测试；Windows 原生链接因缺少 MSVC C++ 编译器与 SDK 无法启动，不能作为通过项。全目标静态检查与 Wasm/Wasm-GC/JS 的运行结果分别记录。CI 的 Linux 原生检查尚待未来推送后实际执行。
+
+## 固定随机种子的独立类型重构
+
+`scripts/test_interop_random.py` 使用固定种子 `20261124`，默认生成 192 条记录。pydlt 负责独立编码；MoonBit 解码后从类型值重新构造载荷，而非直接复制原始字节，再比较完整报文并交回 pydlt 解码。覆盖空 verbose 参数、随机字段组合、有限 IEEE 正常/次正规数、ASCII 控制字符、Unicode/BOM 和 raw。
+
+JSON 对比按类型标记将浮点数值读回 IEEE 数值，避免 JavaScript 将大浮点打印为整数形式而被 Python 当成高精度整数后误报；整数参数依旧使用规范十进制字符串。精确字节比较始终单独执行。该扩展仍不包含高级数组/FIXP/VARI 的外部证明，也不包含所有 NaN 位型。

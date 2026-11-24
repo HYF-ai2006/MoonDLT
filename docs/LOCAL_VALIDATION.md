@@ -1,28 +1,29 @@
-# 本地首版验证记录
+# 本地验证记录
 
-记录日期：2026-11-23。工程：`D:\CodexProjects\MoonDLT`。这是本地执行结果；未推送、报名、发布或运行远程 CI。
+记录时间：2026-11-24T10:53:07.022001+08:00。结果：**PASS_WITH_LIMITATIONS**。
+
+本文件由 `scripts/validate.py` 按实际执行结果生成。未进行远程推送、报名或发布。
 
 | 检查 | 结果 |
 | --- | --- |
-| 全目标静态检查 `moon check --target all --deny-warn` | 通过 |
-| Wasm 运行测试 | 44/44 通过 |
-| Wasm-GC 运行测试 | 44/44 通过 |
-| JavaScript 运行测试 | 44/44 通过 |
-| 格式检查、接口生成、分片读取示例 | 通过 |
-| 独立 `pydlt==0.3.5` 双向互操作 | 54 组向量，类型值和完整字节一致 |
-| 文件扫描与原字节提取 | 通过，包括截断、非法查询、已有输出保护 |
-| Windows 原生运行测试 | 缺少 MSVC C++ 编译器与 SDK，未运行成功 |
-| 云端 CI | 已配置，尚未执行 |
+| `format` | PASS |
+| `compile_all` | PASS |
+| `test_wasm` | PASS (56/56) |
+| `test_wasm_gc` | PASS (56/56) |
+| `test_js` | PASS (56/56) |
+| `demo` | PASS |
+| `interfaces` | PASS |
+| `source_scale` | PASS |
+| `independent_interop` | PASS |
+| `seeded_interop` | PASS |
+| `file_cli` | PASS |
+| `test_release_wasm` | PASS (56/56) |
+| `test_release_js` | PASS (56/56) |
+| `test_native` | NOT_RUN: Windows MSVC C++ compiler/linker and SDK are unavailable in this environment |
 
-核心源码共 6,100 物理行，去除空行和注释后 5,358 行；进一步排除纯结构符号后，**严格有效行 4,198**。上述数字均不计测试、示例、命令行适配器、生成接口、数据或依赖。测试和示例工具另列于机器记录中。
+核心源码：6273 物理行，去除注释和空行后 5511 行，进一步去除纯结构符号后 **4315 严格有效行**。测试、示例、生成文件和依赖均未计入核心。
 
-复现：安装 MoonBit、Node.js 22+、Python 与固定版本开发依赖后，在工程根目录执行：
+复现：`python scripts/validate.py --release-tests`。机器记录见 `LOCAL_VALIDATION.json`，完整日志在忽略目录 `work/validation/`。
 
-```sh
-python -m pip install --target work/pydeps -r scripts/requirements-dev.txt
-python scripts/validate.py
-```
-
-详细命令、退出码、工具链版本和逐文件规模保存在 `LOCAL_VALIDATION.json`；每项完整日志位于忽略目录 `work/validation/`。后续修改后应重新运行脚本，数字以新记录为准，不应只更新本表。
-
-独立互操作覆盖的是双方共有的 v1 标量子集；高级类型的标准推导及边界测试不能替代外部互操作或 AUTOSAR 认证。没有采用真实车辆硬件或量产日志语料，不据此宣称已完成量产集成。
+局限：高级 VARI/FIXP/数组未获得独立 pydlt 互操作证明；没有实车或量产日志语料；云端 CI 尚未执行。
+Windows 原生运行需要 MSVC C++ 编译环境与 SDK，未运行项不能视为通过。

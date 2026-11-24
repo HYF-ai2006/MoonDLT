@@ -135,6 +135,7 @@ def canonical_message(message: pydlt.DltMessage) -> dict:
         message.payload.to_bytes(header.msb_first).hex(),
         "arguments": [argument_json(argument)
                       for argument in message.verbose_payload.arguments]
+        if extended is not None and extended.verbose and message.payload is not None else []
         if extended is not None and extended.verbose else None,
     }
 
@@ -168,8 +169,25 @@ def golden_document() -> dict:
             "producer_version": ORACLE_VERSION, "cases": cases}
 
 
+def normalized_float_values(value):
+    """Read tagged float JSON numbers as IEEE values, not Python big integers.
+
+    JS may stringify a large binary64 value in integer notation. Python's JSON
+    parser then uses an exact int with different decimal digits from the actual
+    IEEE value. Only tagged floats are normalized; integer payloads stay strings.
+    """
+    if isinstance(value, list):
+        return [normalized_float_values(item) for item in value]
+    if isinstance(value, dict):
+        result = {name: normalized_float_values(item) for name, item in value.items()}
+        if value.get("kind") == "float" and type(value.get("value")) in (int, float):
+            result["value"] = float(value["value"])
+        return result
+    return value
+
+
 def assert_equal(actual, expected, context: str) -> None:
-    if actual != expected:
+    if normalized_float_values(actual) != normalized_float_values(expected):
         raise AssertionError(
             f"{context}\nEXPECTED: {json.dumps(expected, ensure_ascii=False, sort_keys=True)}"
             f"\nACTUAL: {json.dumps(actual, ensure_ascii=False, sort_keys=True)}"

@@ -6,6 +6,8 @@ MoonDLT 是以 MoonBit 实现的 **DLT v1 二进制日志编解码与流处理�
 
 当前工程在本地开发，模块名 `local/moondlt` 是开发用命名空间；尚未推送、报名或发布。完成公开仓库和 Mooncakes 命名空间配置后才能用于正式提交。参赛说明见 [PROPOSAL.md](PROPOSAL.md)，功能差异证据见 [docs/DIFFERENTIATION.md](docs/DIFFERENTIATION.md)。
 
+最近一次本地检查修复记录见 [2026-11-24 自查](docs/LOCAL_REVIEW_20261124.md)，逐项测试与规模数据见 [本地验证记录](docs/LOCAL_VALIDATION.md)。
+
 ## 能处理什么
 
 - DLT v1 标准头、ECU/session/timestamp 可选字段、扩展头和小端/大端载荷。
@@ -85,9 +87,12 @@ python scripts/test_file_cli.py
 ```sh
 python -m pip install --target work/pydeps pydlt==0.3.5
 python scripts/interop.py
+python scripts/test_interop_random.py
 ```
 
 脚本先检查提交的确定性黄金文件，再构建 MoonBit JS 可执行文件，比较两个方向的类型值和完整字节：pydlt 编码 → MoonDLT 解码；MoonDLT 编码 → pydlt 解码。覆盖 54 个向量，包括三种封装、所有头部可选字段组合、两种字节序、64 位边界、中文与补充平面字符、空字符串和空原始字节。结果与局限见 [docs/VALIDATION.md](docs/VALIDATION.md)。
+
+固定随机种子脚本另检查 192 条独立记录，包含空参数、随机整数、有限正常/次正规浮点及 Unicode/BOM。MoonBit 从解码后的类型值重新构造记录，比较原始字节；这不会扩大高级类型的互操作承诺。
 
 ## 代码规模
 

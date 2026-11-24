@@ -1,5 +1,5 @@
 {
-  "recorded_at": "2026-11-23T23:37:05.444038+08:00",
+  "recorded_at": "2026-11-24T10:53:07.022001+08:00",
   "scope": "Local validation only; no remote repository, contest submission or Mooncakes publication",
   "platform": "Windows",
   "node": "v24.22.3",
@@ -39,8 +39,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 44,
-        "passed": 44,
+        "total": 56,
+        "passed": 56,
         "failed": 0
       }
     },
@@ -56,8 +56,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 44,
-        "passed": 44,
+        "total": 56,
+        "passed": 56,
         "failed": 0
       }
     },
@@ -73,8 +73,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 44,
-        "passed": 44,
+        "total": 56,
+        "passed": 56,
         "failed": 0
       }
     },
@@ -121,6 +121,15 @@
       "status": "PASS"
     },
     {
+      "name": "seeded_interop",
+      "command": [
+        "C:\\Users\\11619\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "scripts/test_interop_random.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
       "name": "file_cli",
       "command": [
         "C:\\Users\\11619\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
@@ -128,6 +137,42 @@
       ],
       "exit_code": 0,
       "status": "PASS"
+    },
+    {
+      "name": "test_release_wasm",
+      "command": [
+        "moon",
+        "test",
+        "--target",
+        "wasm",
+        "--release",
+        "--deny-warn"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "tests": {
+        "total": 56,
+        "passed": 56,
+        "failed": 0
+      }
+    },
+    {
+      "name": "test_release_js",
+      "command": [
+        "moon",
+        "test",
+        "--target",
+        "js",
+        "--release",
+        "--deny-warn"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "tests": {
+        "total": 56,
+        "passed": 56,
+        "failed": 0
+      }
     },
     {
       "name": "test_native",
@@ -147,34 +192,34 @@
     ],
     "totals": {
       "core": {
-        "physical": 6100,
-        "code_nonblank": 5358,
-        "effective_strict": 4198
+        "physical": 6273,
+        "code_nonblank": 5511,
+        "effective_strict": 4315
       },
       "tests": {
-        "physical": 1676,
-        "code_nonblank": 1585,
-        "effective_strict": 1240
+        "physical": 2102,
+        "code_nonblank": 1988,
+        "effective_strict": 1541
       },
       "examples_and_tools": {
-        "physical": 447,
-        "code_nonblank": 404,
-        "effective_strict": 312
+        "physical": 475,
+        "code_nonblank": 431,
+        "effective_strict": 333
       }
     },
     "files": {
       "core": [
         {
           "path": "bytes.mbt",
-          "physical": 186,
-          "code_nonblank": 160,
-          "effective_strict": 123
+          "physical": 230,
+          "code_nonblank": 199,
+          "effective_strict": 155
         },
         {
           "path": "catalog.mbt",
-          "physical": 354,
-          "code_nonblank": 301,
-          "effective_strict": 240
+          "physical": 356,
+          "code_nonblank": 303,
+          "effective_strict": 242
         },
         {
           "path": "codec.mbt",
@@ -184,9 +229,9 @@
         },
         {
           "path": "control.mbt",
-          "physical": 387,
-          "code_nonblank": 342,
-          "effective_strict": 268
+          "physical": 396,
+          "code_nonblank": 348,
+          "effective_strict": 272
         },
         {
           "path": "dictionary.mbt",
@@ -208,9 +253,9 @@
         },
         {
           "path": "source.mbt",
-          "physical": 363,
-          "code_nonblank": 300,
-          "effective_strict": 243
+          "physical": 366,
+          "code_nonblank": 303,
+          "effective_strict": 245
         },
         {
           "path": "stream.mbt",
@@ -220,9 +265,9 @@
         },
         {
           "path": "timeline.mbt",
-          "physical": 406,
-          "code_nonblank": 348,
-          "effective_strict": 284
+          "physical": 424,
+          "code_nonblank": 364,
+          "effective_strict": 295
         },
         {
           "path": "types.mbt",
@@ -232,21 +277,21 @@
         },
         {
           "path": "verbose.mbt",
-          "physical": 428,
-          "code_nonblank": 388,
-          "effective_strict": 299
+          "physical": 448,
+          "code_nonblank": 404,
+          "effective_strict": 314
         },
         {
           "path": "verbose_json.mbt",
-          "physical": 364,
-          "code_nonblank": 336,
-          "effective_strict": 248
+          "physical": 381,
+          "code_nonblank": 353,
+          "effective_strict": 258
         },
         {
           "path": "verbose_parameters.mbt",
-          "physical": 591,
-          "code_nonblank": 527,
-          "effective_strict": 422
+          "physical": 651,
+          "code_nonblank": 581,
+          "effective_strict": 463
         },
         {
           "path": "verbose_selection.mbt",
@@ -281,6 +326,12 @@
           "effective_strict": 74
         },
         {
+          "path": "payload_regression_wbtest.mbt",
+          "physical": 161,
+          "code_nonblank": 150,
+          "effective_strict": 111
+        },
+        {
           "path": "payload_wbtest.mbt",
           "physical": 401,
           "code_nonblank": 384,
@@ -309,6 +360,24 @@
           "physical": 436,
           "code_nonblank": 413,
           "effective_strict": 322
+        },
+        {
+          "path": "transport_regression_wbtest.mbt",
+          "physical": 59,
+          "code_nonblank": 55,
+          "effective_strict": 42
+        },
+        {
+          "path": "unicode_regression_wbtest.mbt",
+          "physical": 80,
+          "code_nonblank": 79,
+          "effective_strict": 59
+        },
+        {
+          "path": "utilities_regression_wbtest.mbt",
+          "physical": 126,
+          "code_nonblank": 119,
+          "effective_strict": 89
         }
       ],
       "examples_and_tools": [
@@ -320,9 +389,9 @@
         },
         {
           "path": "cmd/interop/main.mbt",
-          "physical": 238,
-          "code_nonblank": 223,
-          "effective_strict": 170
+          "physical": 266,
+          "code_nonblank": 250,
+          "effective_strict": 191
         },
         {
           "path": "cmd/node/main.mbt",
