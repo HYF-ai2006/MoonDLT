@@ -313,6 +313,7 @@ pub fn IndexedSource::select(
   payload_budget~ : Int32 = 16777216,
   limits~ : Limits = Limits::default(),
 ) -> Array[Message] raise DltError {
+  check_limits(limits)
   guard payload_budget >= 0 else {
     raise Invalid(0, "negative selection payload budget")
   }
@@ -340,6 +341,7 @@ pub fn IndexedSource::visit_range(
   visit : (Message) -> Bool raise DltError,
   limits~ : Limits = Limits::default(),
 ) -> Int32 raise DltError {
+  check_limits(limits)
   guard start >= 0 && start <= end && end <= self.length() else {
     raise Invalid(0, "catalog interval outside range")
   }

@@ -46,7 +46,10 @@ function build() {
 
 async function main() {
   const settings = options(process.argv.slice(2));
-  if (settings.output && settings.input.toLowerCase() === settings.output.toLowerCase()) {
+  const samePath = settings.output && (process.platform === 'win32'
+    ? settings.input.toLowerCase() === settings.output.toLowerCase()
+    : settings.input === settings.output);
+  if (samePath) {
     throw new Error('Input and output must be different files');
   }
   build();

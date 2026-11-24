@@ -131,15 +131,15 @@ fn read_id(data : BytesView, offset : Int32) -> String raise DltError {
 
 ///|
 fn write_id(out : @buffer.Buffer, id : String) -> Unit raise DltError {
-  let bytes = @utf8.encode(id)
-  guard bytes.length() <= 4 else {
+  guard id.length() <= 4 else {
     raise Invalid(0, "identifier exceeds four bytes")
   }
-  for b in bytes {
-    guard b >= b' ' && b <= b'~' else {
+  for unit in id.code_units() {
+    guard unit.to_int() >= 32 && unit.to_int() <= 126 else {
       raise Invalid(0, "identifier must be printable ASCII")
     }
   }
+  let bytes = encode_text_checked(id, max_bytes=4)
   out.write_bytes(bytes[:])
   for _ in bytes.length()..<4 {
     out.write_byte(b'\x00')
@@ -159,7 +159,7 @@ pub fn hex_encode(bytes : BytesView) -> String {
 
 ///|
 pub fn hex_decode(text : String) -> Bytes raise DltError {
-  let bytes = @utf8.encode(text)
+  let bytes = encode_text_checked(text)
   guard bytes.length() % 2 == 0 else {
     raise Invalid(0, "hex requires even length")
   }
@@ -170,6 +170,50 @@ pub fn hex_decode(text : String) -> Bytes raise DltError {
     out.write_byte(((a << 4) | b).to_byte())
   }
   out.to_bytes()
+}
+
+///|
+/// MoonBit strings can contain unpaired UTF-16 code units. The platform UTF-8
+/// encoder panics on Wasm but replaces them on JS. Validate first so callers
+/// always get DltError, and check the byte budget before allocating UTF-8 data.
+fn encode_text_checked(
+  text : String,
+  max_bytes~ : Int32 = 2147483647,
+) -> Bytes raise DltError {
+  guard max_bytes >= 0 else { raise Invalid(0, "negative UTF-8 byte budget") }
+  let units = text.code_units()
+  let mut position = 0
+  let mut bytes = 0
+  while position < units.length() {
+    let unit = units[position].to_int()
+    let width = if unit >= 0xD800 && unit <= 0xDBFF {
+      guard position + 1 < units.length() else {
+        raise Invalid(position, "unpaired leading UTF-16 surrogate")
+      }
+      let trail = units[position + 1].to_int()
+      guard trail >= 0xDC00 && trail <= 0xDFFF else {
+        raise Invalid(position, "unpaired leading UTF-16 surrogate")
+      }
+      position += 2
+      4
+    } else if unit >= 0xDC00 && unit <= 0xDFFF {
+      raise Invalid(position, "unpaired trailing UTF-16 surrogate")
+    } else {
+      position += 1
+      if unit < 0x80 {
+        1
+      } else if unit < 0x800 {
+        2
+      } else {
+        3
+      }
+    }
+    guard width <= max_bytes - bytes else {
+      raise Limit(position, "UTF-8 text exceeds byte budget")
+    }
+    bytes += width
+  }
+  @utf8.encode(text)
 }
 
 ///|

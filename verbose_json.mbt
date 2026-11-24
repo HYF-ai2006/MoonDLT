@@ -55,6 +55,11 @@ pub fn Argument::from_json(
       verbose_fields(object, ["kind", "width", "value"])
       let width = verbose_width(verbose_field(object, "width"))
       let text = verbose_string(verbose_field(object, "value"))
+      guard text.length() > 0 && text.length() <= 20 else {
+        raise Invalid(
+          0, "signed JSON decimal must contain at most twenty characters",
+        )
+      }
       let value = @string.parse_int64(text[:]) catch {
         _ =>
           raise Invalid(0, "signed JSON value is not an Int64 decimal string")
@@ -70,6 +75,11 @@ pub fn Argument::from_json(
       verbose_fields(object, ["kind", "width", "value"])
       let width = verbose_width(verbose_field(object, "width"))
       let text = verbose_string(verbose_field(object, "value"))
+      guard text.length() > 0 && text.length() <= 20 else {
+        raise Invalid(
+          0, "unsigned JSON decimal must contain at most twenty characters",
+        )
+      }
       let value = @string.parse_uint64(text[:]) catch {
         _ =>
           raise Invalid(0, "unsigned JSON value is not a UInt64 decimal string")
@@ -124,7 +134,9 @@ pub fn Argument::from_json(
     }
     _ => raise Invalid(0, "unknown JSON parameter kind")
   }
-  ignore(argument_wire_length(argument, limits))
+  guard argument_wire_length(argument, limits) <= limits.message_bytes else {
+    raise Limit(0, "JSON argument exceeds encoded payload byte budget")
+  }
   argument
 }
 
@@ -245,6 +257,11 @@ pub fn VerboseParameter::from_json(
       }
       let quantization = Float::reinterpret_from_uint(read_u32(bits[:], 0, Big))
       let text = verbose_string(verbose_field(item, "offset"))
+      guard text.length() > 0 && text.length() <= 20 else {
+        raise Invalid(
+          0, "fixed-point JSON offset must contain at most twenty characters",
+        )
+      }
       let offset = @string.parse_int64(text[:]) catch {
         _ =>
           raise Invalid(0, "fixed-point offset is not an Int64 decimal string")

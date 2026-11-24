@@ -254,7 +254,10 @@ pub fn Source::copy_selected(
   while cursor.next_entry() is Some(entry) {
     if select(entry) {
       let bytes = self.read_checked(entry.offset, entry.length)
-      ignore(decode_exact(bytes[:], framing~, limits~))
+      let message = decode_exact(bytes[:], framing~, limits~)
+      guard message.header == entry.header && message.storage == entry.storage else {
+        raise Invalid(0, "source metadata changed after record selection")
+      }
       emit(bytes)
       copied += 1UL
     }

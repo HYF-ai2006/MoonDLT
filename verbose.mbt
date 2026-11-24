@@ -90,11 +90,31 @@ pub fn Message::with_arguments(
   }
   guard ext.verbose else { raise Invalid(0, "extended header is non-verbose") }
   let extended = Some({ ..ext, argument_count: args.length(), })
-  {
-    header: { ..header, extended, },
+  finish_verbose_message(
+    { ..header, extended, },
+    encode_arguments(args, header.endian, limits~),
     storage,
-    payload: encode_arguments(args, header.endian, limits~),
+    limits,
+  )
+}
+
+///|
+/// Payload budgets do not include the outer header, so message construction
+/// performs a final complete-message check before returning a writable value.
+fn finish_verbose_message(
+  header : Header,
+  payload : Bytes,
+  storage : StorageHeader?,
+  limits : Limits,
+) -> Message raise DltError {
+  let scratch = @buffer.Buffer::Buffer()
+  write_header(scratch, header, payload.length(), limits)
+  if storage is Some(info) {
+    ignore(info.time_microseconds())
+    scratch.reset()
+    write_id(scratch, info.ecu)
   }
+  { header, storage, payload, }
 }
 
 ///|
@@ -174,16 +194,16 @@ fn argument_text_bytes(
   text : String,
   limits : Limits,
 ) -> Bytes raise DltError {
-  let bytes = @utf8.encode(text)
-  guard bytes.length() < limits.string_bytes && bytes.length() < 65535 else {
+  guard limits.string_bytes > 0 else {
     raise Limit(0, "string including terminator exceeds maximum")
   }
-  for b in bytes {
-    guard b != b'\x00' else {
+  let bytes = encode_text_checked(text, max_bytes=limits.string_bytes - 1)
+  for byte in bytes {
+    guard byte != b'\x00' else {
       raise Invalid(0, "embedded NUL in verbose string")
     }
     if encoding == Ascii {
-      guard b.to_int() < 128 else {
+      guard byte.to_int() < 128 else {
         raise Invalid(0, "non-ASCII byte in ASCII parameter")
       }
     }

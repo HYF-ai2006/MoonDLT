@@ -1,7 +1,8 @@
 ///|
 /// Passive codec for DLT v1 control services. It never opens a connection or
 /// sends requests. Unknown service bodies remain available without interpretation.
-/// A level/status of -1 selects the configured default (wire byte 0xff).
+/// Per-context services accept -1 to select the configured default (0xff).
+/// Services that set the default itself require a concrete level/status.
 pub(all) enum ControlRequest {
   SetLogLevel(String, String, Int32, String)
   SetTraceStatus(String, String, Int32, String)
@@ -45,6 +46,14 @@ fn control_level(value : Int32, trace : Bool) -> Unit raise DltError {
     raise Invalid(
       0, "control log level/trace status is outside its wire domain",
     )
+  }
+}
+
+///|
+fn control_default_level(value : Int32, trace : Bool) -> Unit raise DltError {
+  control_level(value, trace)
+  guard value >= 0 else {
+    raise Invalid(0, "a default log level/trace status must be concrete")
   }
 }
 
@@ -102,12 +111,12 @@ pub fn encode_control_request(
       write_id(out, interface)
     }
     SetDefaultLogLevel(level, interface) => {
-      control_level(level, false)
+      control_default_level(level, false)
       out.write_byte(level.to_byte())
       write_id(out, interface)
     }
     SetDefaultTraceStatus(status, interface) => {
-      control_level(status, true)
+      control_default_level(status, true)
       out.write_byte(status.to_byte())
       write_id(out, interface)
     }
@@ -185,13 +194,13 @@ pub fn decode_control_request(
     17U => {
       control_exact(data, 9)
       let level = control_byte(data[4])
-      control_level(level, false)
+      control_default_level(level, false)
       SetDefaultLogLevel(level, read_id(data, 5))
     }
     18U => {
       control_exact(data, 9)
       let status = control_byte(data[4])
-      control_level(status, true)
+      control_default_level(status, true)
       SetDefaultTraceStatus(status, read_id(data, 5))
     }
     19U => {
@@ -277,7 +286,7 @@ pub fn software_version_response(
   version : String,
   endian : Endian,
 ) -> ControlResponse raise DltError {
-  let bytes = @utf8.encode(version)
+  let bytes = encode_text_checked(version, max_bytes=65526)
   guard bytes.length() <= 65526 else {
     raise Limit(0, "software version exceeds wire length")
   }

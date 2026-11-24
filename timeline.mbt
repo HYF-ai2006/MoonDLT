@@ -155,7 +155,12 @@ pub fn ContinuityTracker::observe(
       }
     }
     Some(old) => {
-      let session_changed = session != old.session
+      // WSID/WTMS may be omitted independently on otherwise contiguous records.
+      // Absence supplies no evidence of a new session or a clock reset.
+      let session_changed = match (old.session, session) {
+        (Some(before), Some(now)) => before != now
+        _ => false
+      }
       let mut wraps = if session_changed { 0UL } else { old.wraps }
       let mut gaps = old.gaps
       let mut repeated = old.repeated
@@ -204,9 +209,22 @@ pub fn ContinuityTracker::observe(
       {
         key,
         counter,
-        session,
-        timestamp,
-        reception,
+        session: match session {
+          Some(_) => session
+          None => old.session
+        },
+        timestamp: if session_changed {
+          timestamp
+        } else {
+          match timestamp {
+            Some(_) => timestamp
+            None => old.timestamp
+          }
+        },
+        reception: match reception {
+          Some(_) => reception
+          None => old.reception
+        },
         wraps,
         messages: old.messages + 1UL,
         gaps,

@@ -395,7 +395,7 @@ fn dictionary_write_field(
       guard actual_encoding == encoding else {
         raise Invalid(out.length(), "text encoding does not match schema")
       }
-      let bytes = @utf8.encode(text)
+      let bytes = encode_text_checked(text, max_bytes=width)
       guard bytes.length() <= width else {
         raise Invalid(out.length(), "text exceeds fixed field width")
       }

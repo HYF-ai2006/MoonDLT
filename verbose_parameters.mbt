@@ -146,11 +146,12 @@ pub fn Message::with_parameters(
   }
   guard ext.verbose else { raise Invalid(0, "extended header is non-verbose") }
   let extended = Some({ ..ext, argument_count: parameters.length(), })
-  {
+  finish_verbose_message(
+    { ..header, extended, },
+    encode_parameters(parameters, header.endian, limits~),
     storage,
-    header: { ..header, extended, },
-    payload: encode_parameters(parameters, header.endian, limits~),
-  }
+    limits,
+  )
 }
 
 ///|
@@ -310,11 +311,70 @@ fn scalar_has_unit(arg : Argument) -> Bool {
 }
 
 ///|
+fn metadata_wire_length(
+  info : VariableInfo,
+  numeric_unit : Bool,
+  limits : Limits,
+) -> Int32 raise DltError {
+  let name = metadata_bytes(info.name, limits)
+  if numeric_unit {
+    let unit = match info.unit {
+      Some(text) => metadata_bytes(text, limits)
+      None => raise Invalid(0, "numeric metadata requires an explicit unit")
+    }
+    6 + name.length() + unit.length()
+  } else {
+    guard info.unit is None else {
+      raise Invalid(0, "Boolean, text and raw metadata cannot contain a unit")
+    }
+    3 + name.length()
+  }
+}
+
+///|
+/// Preflight validates the whole typed value and its encoded budget before a
+/// writer allocates output or a numerical consumer accepts malformed values.
+fn parameter_wire_length(
+  parameter : VerboseParameter,
+  limits : Limits,
+) -> Int32 raise DltError {
+  let (type_word, numeric_unit, base_length) = match parameter.value {
+    Scalar(arg) =>
+      (
+        argument_type_word(arg),
+        scalar_has_unit(arg),
+        argument_wire_length(arg, limits),
+      )
+    NumericArray(kind, dimensions, values) => {
+      validate_numeric_array(kind, dimensions, values, limits)
+      (
+        numeric_type_word(kind),
+        true,
+        6 + dimensions.length() * 2 + values.length() * numeric_type_width(kind),
+      )
+    }
+  }
+  let mut length = base_length
+  if parameter.variable is Some(variable) {
+    length += metadata_wire_length(variable, numeric_unit, limits)
+  }
+  if parameter.scaling is Some(scaling) {
+    validate_scaling(type_word, scaling)
+    length += if word_width(type_word, 0) <= 32 { 8 } else { 12 }
+  }
+  guard length <= limits.message_bytes else {
+    raise Limit(0, "encoded parameter exceeds message limit")
+  }
+  length
+}
+
+///|
 fn encode_one_parameter(
   parameter : VerboseParameter,
   endian : Endian,
   limits : Limits,
 ) -> Bytes raise DltError {
+  ignore(parameter_wire_length(parameter, limits))
   let out = @buffer.Buffer::Buffer()
   let variable_flag = if parameter.variable is Some(_) { 0x800U } else { 0U }
   let scaling_flag = if parameter.scaling is Some(_) { 0x1000U } else { 0U }
@@ -566,6 +626,7 @@ fn read_scaling(
 pub fn VerboseParameter::logical_values(
   self : VerboseParameter,
 ) -> Array[Double] raise DltError {
+  ignore(parameter_wire_length(self, Limits::default()))
   let arguments = match self.value {
     Scalar(value) => [value]
     NumericArray(_, _, values) => values
@@ -574,9 +635,8 @@ pub fn VerboseParameter::logical_values(
   for argument in arguments {
     let numeric = match argument {
       Boolean(value) => if value { 1.0 } else { 0.0 }
-      Signed(_, value) => value.to_double()
-      Unsigned(_, value) => value.to_double()
-      Floating(_, value) => value
+      Signed(_, _) | Unsigned(_, _) | Floating(_, _) =>
+        argument.as_double(allow_lossy=true)
       _ => raise Invalid(0, "logical values require numeric parameters")
     }
     out.push(

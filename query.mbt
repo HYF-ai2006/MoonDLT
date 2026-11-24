@@ -57,7 +57,7 @@ pub fn Filter::validate(self : Filter) -> Unit raise DltError {
     match ids {
       Some(values) =>
         for id in values {
-          let bytes = @utf8.encode(id)
+          let bytes = encode_text_checked(id, max_bytes=4)
           guard bytes.length() <= 4 else {
             raise Invalid(0, "filter identifier exceeds four bytes")
           }
@@ -483,7 +483,7 @@ fn expression_lex(
   limits : ExpressionLimits,
 ) -> Array[ExpressionLexeme] raise DltError {
   check_expression_limits(limits)
-  let data = @utf8.encode(input)
+  let data = encode_text_checked(input, max_bytes=limits.input_bytes)
   guard data.length() <= limits.input_bytes else {
     raise Limit(0, "header expression input bound exceeded")
   }

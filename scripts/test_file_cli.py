@@ -52,6 +52,15 @@ def main() -> None:
         truncated = Path(temporary) / 'truncated.dlt'
         truncated.write_bytes(FIXTURE.read_bytes()[:-1])
         invoke('inspect', truncated, success=False)
+        partial = Path(temporary) / 'partial-extraction.dlt'
+        invoke('extract', truncated, partial, success=False)
+        assert not partial.exists()  # failure after earlier writes cannot leave a partial recording
+        case_input = Path(temporary) / 'Case.dlt'
+        case_output = Path(temporary) / 'case.dlt'
+        case_input.write_bytes(FIXTURE.read_bytes())
+        if not case_output.exists():  # a case-sensitive filesystem permits these distinct names
+            invoke('extract', case_input, case_output)
+            assert case_output.read_bytes() == case_input.read_bytes()
     print('PASS: actual file inspect/extract, exact bytes, bounded reads, errors and no-overwrite')
 
 
