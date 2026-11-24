@@ -1,6 +1,6 @@
 # 生态差异与检索证据
 
-检索日期：2026-11-23。本文用于让审核者判断功能边界，不能证明所有报名项目或未公开仓库都不存在类似能力。
+检索日期：2026-11-24；首次选题检索为 2026-11-23。本次复查排除已发布的 MoonDLT 自身，本文不能证明所有报名项目或未公开仓库都不存在类似能力。
 
 ## 独立贡献如何界定
 
@@ -14,10 +14,11 @@ MoonDLT 的输入输出是已有的 DLT v1 二进制记录。主要成果是可�
 | --- | --- | --- |
 | [fuyun-2026/moonbit-canbus](https://mooncakes.io/docs/fuyun-2026/moonbit-canbus) | CAN/CAN-FD 帧、总线建模、信号打包与回放 | DLT 是 ECU 应用日志的独立二进制交换协议。MoonDLT 不重做 CAN 总线模拟或物理帧解码。 |
 | [curry3point/dbc-toolkit](https://mooncakes.io/docs/curry3point/dbc-toolkit) | DBC 描述和 CAN 信号编解码 | DLT 的标准头、上下文和 verbose 参数不等同于 DBC 的 CAN 信号位域。 |
-| [brickfrog/moontrace](https://mooncakes.io/docs/brickfrog/moontrace) | 结构化跟踪、事件和订阅端 | MoonDLT 读写外部系统已产生的 DLT 数据；不替代事件采集 API。未来可为日志框架提供 DLT 适配器。 |
+| [brickfrog/moontrace](https://mooncakes.io/docs/brickfrog/moontrace) | 结构化跟踪及 console/JSON/logfmt/OTLP 等输出 | MoonDLT 负责已有 DLT 记录的交换语义，可作为日志框架实现 DLT 适配器的底层协议库；当前未声明交付 moontrace 专用适配器。 |
 | [moonbitstack/moontel](https://mooncakes.io/docs/moonbitstack/moontel) | OpenTelemetry 追踪、指标、日志和 OTLP | DLT v1 与 OTLP 不是同一格式；MoonDLT 不实现新遥测平台。 |
-| [btlqql/moon_tracelens](https://mooncakes.io/docs/btlqql/moon_tracelens) | 通用日志摄取与离线调查 | MoonDLT 的关键工作是协议编解码和有界流处理，过滤只是使用编解码器的配套能力。 |
-| 本地已有 MoonMCAP 项目 | MCAP 通用消息容器 | DLT 头部、类型词、参数数目、字节序及控制消息语义属于另一标准。MoonDLT 不复制 MCAP 的记录结构或 API 实现。 |
+| [btlqql/moon_tracelens](https://mooncakes.io/docs/btlqql/moon_tracelens) | JSONL/五列 pipe 日志摄取与离线调查 | MoonDLT 的关键工作是 DLT 二进制编解码和有界流处理，过滤是建立在协议语义上的配套能力。 |
+| [LilaLola67/moonmcap](https://github.com/LilaLola67/moonmcap) | MCAP 0 通用消息容器及 ROS/Protobuf/XCDR 载荷处理 | DLT 头部、类型词、参数数目、字节序及控制载荷属于另一标准；MCAP 容器不能直接完成这些解释。 |
+| [myc1234567/moonbit-canbus](https://github.com/myc1234567/moonbit-canbus) | CAN/CAN-FD、ISO-TP/UDS 等总线和诊断能力 | UDS 诊断与 DLT 日志交换属于不同协议。未见其公开声明支持 DLT 标准头与 verbose 类型词。 |
 
 共同含有“日志”“过滤”“索引”不代表核心相同。判断时应比较输入输出格式、协议语义、可复用 API、部署限制和实现代码；如果发现已有 MoonBit DLT 项目，应重新比较后决定贡献给现有库还是保留当前工程。
 
@@ -35,10 +36,11 @@ moon search dltparse --limit 5
 moon search "log trace" --limit 10
 ```
 
-- `dlt` 返回几何中的 Direct Linear Transform；未见 Diagnostic Log and Trace 包。
+- `dlt` 返回本项目 `HYF-ai2006/moondlt` 与几何中的 Direct Linear Transform；排除自身后未见另一直接匹配。
 - `automotive` 返回 CAN/DBC 等项目；已在上表明确区分。
 - `diagnostic` 多为编译器诊断、报告和工具库；`covesa` 模糊匹配覆盖率库。
-- GitHub 公共仓库 API 查询 `dlt language:MoonBit` 返回 `total_count=0`；另以 MoonBit 与 COVESA、Diagnostic Log、DLT 组合进行网页检索，未见直接实现。
+- GitHub 公共仓库 API 查询 `dlt language:MoonBit` 返回 `total_count=1`，结果仅本项目；排除自身后未发现另一直接匹配。这修正了尚未发布时 `total_count=0` 的历史记录。
+- 本次逐读 8 个相邻仓库的公开 README，并进行 DLT 关键词代码检索，未发现直接支持 DLT/AUTOSAR Diagnostic Log/FIBEX 的公开声明或命中；索引、名称与公开范围有限，不能据此穷尽全部实现。
 - [当前赛事官网](https://moonbitlang.github.io/Hackathon2026/)及其 [App.tsx](https://github.com/moonbitlang/Hackathon2026/blob/main/src/App.tsx)显示十一月赛季和项目公开、实质贡献、可运行与开源合规要求。官网未提供可穷尽的所有报名项目名单，因此没有宣称“已排除全部参赛项目”。
 
 ## 主动排除过的重复选题

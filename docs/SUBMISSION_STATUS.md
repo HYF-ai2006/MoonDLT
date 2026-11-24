@@ -10,7 +10,15 @@
 - 远程 CI：[完整检查已通过](https://github.com/HYF-ai2006/MoonDLT/actions/runs/45334151970)，包含 Ubuntu 上 Wasm、Wasm-GC、JS、Native 的测试、Release 测试、54 个固定互操作向量、192 条固定随机种子记录及文件消费者测试。结果元数据保存在 `CI_VALIDATION.json`。
 - 工具链：首次云端运行揭示新版格式器差异；已固定编译器和 core 为 `0.10.17+093cb8f9c`，保留并通过全部检查。本机 Windows 原生环境仍缺 MSVC，不能把 Ubuntu Native 结果等同于 Windows Native 已验证。
 
-已有：项目代码与运行示例、一页申报草稿、生态差异证据、技术设计、兼容性边界、独立互操作与黄金样本、代码规模统计脚本、开源许可证及来源说明。
+已有：项目代码与运行示例、经逐项核对的申报终稿、生态差异证据、技术设计、兼容性边界、独立互操作与黄金样本、代码规模统计脚本、开源许可证及来源说明。公共 `PROPOSAL.md` 与私人提交版的技术正文一致；姓名和联系方式仅保留在忽略的 `out/submission/` 提交版。
+
+## 当前报名入口
+
+- [当前官方报名表](https://bxup9uklfcb.feishu.cn/share/base/form/shrcnWUMlgpbwHaXgzV7HmNhNhg)
+- [当前正式章程链接](https://bxup9uklfcb.feishu.cn/wiki/Dx4Bwd6D1i3GfHkajQCcF7SznEd)
+- 入口已同时核对[赛事官网源码](https://github.com/moonbitlang/Hackathon2026/blob/main/src/App.tsx)与当前官网实际部署脚本，日期为 2026-11-24。当前为十一月赛，不能沿用旧八月表单或八月截止时间。
+- 官网要求公开仓库、约一页项目说明、队伍最多 3 人，并按要求加入赛事群、将群昵称改为 GitHub ID。具体截止日期以官方通知为准。
+- 飞书登录后表单的实际字段和章程正文未由本次工具读取；未代填或提交报名表。
 
 正式提交前仍需：
 
