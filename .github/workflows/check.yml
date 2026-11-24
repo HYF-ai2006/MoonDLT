@@ -11,12 +11,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hustcer/setup-moonbit@v1
+        with:
+          version: '0.10.17+093cb8f9c'
+          core-version: '0.10.17+093cb8f9c'
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+      - name: Record toolchain
+        run: moon version --all
       - name: Formatting
         run: moon fmt --check
       - name: Compile all targets

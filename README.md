@@ -33,6 +33,8 @@ moon add HYF-ai2006/moondlt@0.1.0
 
 需要 MoonBit 工具链；文件命令行工具需要 Node.js 22 或更新版本。项目核心只依赖 MoonBit 标准库。
 
+当前本地验证和 CI 固定使用 MoonBit 编译器及 core `0.10.17+093cb8f9c`，对应 2026-10-21 工具链，保持格式检查、生成接口与运行测试的环境一致。
+
 ```sh
 moon check --target all --deny-warn
 moon test --target wasm --deny-warn
