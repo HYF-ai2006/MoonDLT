@@ -12,6 +12,8 @@
 
 已有：项目代码与运行示例、经逐项核对的申报终稿、生态差异证据、技术设计、兼容性边界、独立互操作与黄金样本、代码规模统计脚本、开源许可证及来源说明。公共 `PROPOSAL.md` 与私人提交版的技术正文一致；姓名和联系方式仅保留在忽略的 `out/submission/` 提交版。
 
+已按申报人提供的八项要求重排申报书，补齐三个含输入、处理、输出和验收方式的使用场景；既有十次实质提交及来源许可证核对见 [SUBMISSION_REQUIREMENTS_CHECK.md](SUBMISSION_REQUIREMENTS_CHECK.md)。
+
 ## 当前报名入口
 
 - [当前官方报名表](https://bxup9uklfcb.feishu.cn/share/base/form/shrcnWUMlgpbwHaXgzV7HmNhNhg)
