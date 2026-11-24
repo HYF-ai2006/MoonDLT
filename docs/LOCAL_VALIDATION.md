@@ -1,8 +1,8 @@
 # 本地验证记录
 
-记录时间：2026-11-24T10:53:07.022001+08:00。结果：**PASS_WITH_LIMITATIONS**。
+记录时间：2026-11-24T13:18:26.903063+08:00。结果：**PASS_WITH_LIMITATIONS**。
 
-本文件由 `scripts/validate.py` 按实际执行结果生成。未进行远程推送、报名或发布。
+本文件由 `scripts/validate.py` 按实际执行结果生成。该脚本只记录本地检查，不执行远程推送、报名或发布。
 
 | 检查 | 结果 |
 | --- | --- |
@@ -25,5 +25,5 @@
 
 复现：`python scripts/validate.py --release-tests`。机器记录见 `LOCAL_VALIDATION.json`，完整日志在忽略目录 `work/validation/`。
 
-局限：高级 VARI/FIXP/数组未获得独立 pydlt 互操作证明；没有实车或量产日志语料；云端 CI 尚未执行。
+局限：高级 VARI/FIXP/数组未获得独立 pydlt 互操作证明；没有实车或量产日志语料；远程 CI 和发布状态见 `SUBMISSION_STATUS.md`。
 Windows 原生运行需要 MSVC C++ 编译环境与 SDK，未运行项不能视为通过。

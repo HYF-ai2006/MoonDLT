@@ -4,7 +4,13 @@ MoonDLT 是以 MoonBit 实现的 **DLT v1 二进制日志编解码与流处理�
 
 核心面向已经产生的 `.dlt` 文件和 DLT 消息字节流，采用明确的长度、参数数目和缓存上限。读取器不依赖 libdlt、C/C++ FFI、车辆硬件或常驻守护进程。
 
-当前工程在本地开发，模块名 `local/moondlt` 是开发用命名空间；尚未推送、报名或发布。完成公开仓库和 Mooncakes 命名空间配置后才能用于正式提交。参赛说明见 [PROPOSAL.md](PROPOSAL.md)，功能差异证据见 [docs/DIFFERENTIATION.md](docs/DIFFERENTIATION.md)。
+维护者为 [HYF-ai2006](https://github.com/HYF-ai2006)，项目仓库为 [HYF-ai2006/MoonDLT](https://github.com/HYF-ai2006/MoonDLT)，Mooncakes 包名为 `HYF-ai2006/moondlt`。参赛说明见 [PROPOSAL.md](PROPOSAL.md)，功能差异证据见 [docs/DIFFERENTIATION.md](docs/DIFFERENTIATION.md)，实际发布及 CI 状态见 [docs/SUBMISSION_STATUS.md](docs/SUBMISSION_STATUS.md)。
+
+添加依赖：
+
+```sh
+moon add HYF-ai2006/moondlt@0.1.0
+```
 
 最近一次本地检查修复记录见 [2026-11-24 自查](docs/LOCAL_REVIEW_20261124.md)，逐项测试与规模数据见 [本地验证记录](docs/LOCAL_VALIDATION.md)。
 
@@ -51,7 +57,7 @@ let encoded = @dlt.encode(decoded.message)
 
 ```moonbit
 import {
-  "local/moondlt" @dlt,
+  "HYF-ai2006/moondlt" @dlt,
 }
 ```
 

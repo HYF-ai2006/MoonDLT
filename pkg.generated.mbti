@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "local/moondlt"
+package "HYF-ai2006/moondlt"
 
 import {
   "moonbitlang/core/debug",

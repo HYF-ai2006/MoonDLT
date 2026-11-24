@@ -57,12 +57,12 @@ def write_summary(report: dict) -> None:
     core = report.get("source_scale", {}).get("totals", {}).get("core", {})
     text = "\n".join([
         "# 本地验证记录", "", f"记录时间：{report['recorded_at']}。结果：**{report['result']}**。",
-        "", "本文件由 `scripts/validate.py` 按实际执行结果生成。未进行远程推送、报名或发布。",
+        "", "本文件由 `scripts/validate.py` 按实际执行结果生成。该脚本只记录本地检查，不执行远程推送、报名或发布。",
         "", "| 检查 | 结果 |", "| --- | --- |", *rows, "",
         f"核心源码：{core.get('physical', '未知')} 物理行，去除注释和空行后 {core.get('code_nonblank', '未知')} 行，"
         f"进一步去除纯结构符号后 **{core.get('effective_strict', '未知')} 严格有效行**。测试、示例、生成文件和依赖均未计入核心。",
         "", "复现：`python scripts/validate.py --release-tests`。机器记录见 `LOCAL_VALIDATION.json`，完整日志在忽略目录 `work/validation/`。",
-        "", "局限：高级 VARI/FIXP/数组未获得独立 pydlt 互操作证明；没有实车或量产日志语料；云端 CI 尚未执行。",
+        "", "局限：高级 VARI/FIXP/数组未获得独立 pydlt 互操作证明；没有实车或量产日志语料；远程 CI 和发布状态见 `SUBMISSION_STATUS.md`。",
         "Windows 原生运行需要 MSVC C++ 编译环境与 SDK，未运行项不能视为通过。", "",
     ])
     (ROOT / "docs" / "LOCAL_VALIDATION.md").write_text(text, encoding="utf-8")
@@ -107,7 +107,7 @@ def main() -> None:
                          capture_output=True, encoding="utf-8", check=True)
     report = {
         "recorded_at": datetime.now(timezone(timedelta(hours=8))).isoformat(),
-        "scope": "Local validation only; no remote repository, contest submission or Mooncakes publication",
+        "scope": "Local build, test and interoperability evidence; publication status is recorded separately in docs/SUBMISSION_STATUS.md",
         "platform": platform.system(), "node": node.stdout.strip(),
         "toolchain": toolchain.stdout.strip(), "checks": checks,
         "source_scale": json.loads(scale.stdout),
@@ -115,7 +115,7 @@ def main() -> None:
             "Advanced VARI/FIXP/array types have standard-derived unit tests, not independent pydlt interoperability evidence",
             "The 54 external vectors cover the common v1 scalar profile, not complete AUTOSAR certification",
             "No real vehicle hardware or production fleet log corpus was used",
-            "Remote CI configuration has not been executed on a hosting service",
+            "Remote CI and registry publication are tracked separately in docs/SUBMISSION_STATUS.md",
         ],
     }
     report["result"] = "FAIL" if any(check["status"] == "FAIL" for check in checks) else "PASS_WITH_LIMITATIONS"

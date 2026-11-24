@@ -1,6 +1,8 @@
-name = "local/moondlt"
+name = "HYF-ai2006/moondlt"
 
 version = "0.1.0"
+
+repository = "https://github.com/HYF-ai2006/MoonDLT"
 
 license = "Apache-2.0"
 

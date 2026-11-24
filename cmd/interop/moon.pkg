@@ -1,5 +1,5 @@
 import {
-  "local/moondlt" @dlt,
+  "HYF-ai2006/moondlt" @dlt,
   "moonbitlang/core/env",
 }
 

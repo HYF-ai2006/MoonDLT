@@ -9,7 +9,7 @@ node scripts/moondlt.mjs extract input.dlt selected.dlt --filter 'ecu == "ECU1"'
 
 Node.js 22+ 负责范围文件 I/O，MoonBit 负责协议与查询。当前文件入口只接受 Storage 封装，每次扫描最多一百万条记录。摘要上限不改变扫描和匹配总数；提取保留完整原记录，输出文件必须尚不存在。`inspect` 不解释参数载荷，类型参数可通过下面的库接口按需读取。
 
-以下片段用于自己的 MoonBit 函数体；含编解码的函数需要声明 `raise DltError`，同时调用 JSON 文本解析时还需处理 `@json.ParseError`。导入模块为 `"local/moondlt" @dlt`；读取 JSON 文本还需 `"moonbitlang/core/json"`。`local` 是当前本地命名空间，发布前按维护者账户调整。
+以下片段用于自己的 MoonBit 函数体；含编解码的函数需要声明 `raise DltError`，同时调用 JSON 文本解析时还需处理 `@json.ParseError`。导入模块为 `"HYF-ai2006/moondlt" @dlt`；读取 JSON 文本还需 `"moonbitlang/core/json"`。包命名空间与已核验的 Mooncakes 维护者账户一致。
 
 ## 先分清三个封装和两个时钟
 

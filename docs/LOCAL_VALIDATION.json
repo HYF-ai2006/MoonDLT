@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-11-24T10:53:07.022001+08:00",
-  "scope": "Local validation only; no remote repository, contest submission or Mooncakes publication",
+  "recorded_at": "2026-11-24T13:18:26.903063+08:00",
+  "scope": "Local build, test and interoperability evidence; publication status is recorded separately in docs/SUBMISSION_STATUS.md",
   "platform": "Windows",
   "node": "v24.22.3",
   "toolchain": "moon 0.1.20261021 (a4f8933 2026-10-21) ~\\.moon\\bin\\moon.exe\nmoonc v0.10.17+093cb8f9c (2026-10-21) \\\\?\\C:\\Users\\11619\\.moon\\bin\\moonc.exe\nmoonrun 0.1.20261021 (a4f8933 2026-10-21) \\\\?\\C:\\Users\\11619\\.moon\\bin\\moonrun.exe\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
@@ -406,7 +406,7 @@
     "Advanced VARI/FIXP/array types have standard-derived unit tests, not independent pydlt interoperability evidence",
     "The 54 external vectors cover the common v1 scalar profile, not complete AUTOSAR certification",
     "No real vehicle hardware or production fleet log corpus was used",
-    "Remote CI configuration has not been executed on a hosting service"
+    "Remote CI and registry publication are tracked separately in docs/SUBMISSION_STATUS.md"
   ],
   "result": "PASS_WITH_LIMITATIONS"
 }
