@@ -2,6 +2,7 @@
 package "HYF-ai2006/moondlt"
 
 import {
+  "moonbitlang/core/bigint",
   "moonbitlang/core/debug",
 }
 
@@ -28,6 +29,8 @@ pub fn decode_exact(BytesView, framing? : Framing, limits? : Limits) -> Message 
 
 pub fn decode_parameters(BytesView, Int32, Endian, limits? : Limits) -> Array[VerboseParameter] raise DltError
 
+pub fn decode_wire_parameters(BytesView, Int32, Endian, limits? : Limits, budget? : TreeBudget) -> Array[WireParameter] raise DltError
+
 pub fn encode(Message, framing? : Framing, limits? : Limits) -> Bytes raise DltError
 
 pub fn encode_all(ArrayView[Message], framing? : Framing, limits? : Limits, max_bytes? : Int32) -> Bytes raise DltError
@@ -41,6 +44,8 @@ pub fn encode_control_response(ControlResponse, Endian) -> Bytes raise DltError
 pub fn encode_messages(ArrayView[Message], framing? : Framing, limits? : Limits, maximum_bytes? : Int32) -> Bytes raise DltError
 
 pub fn encode_parameters(Array[VerboseParameter], Endian, limits? : Limits) -> Bytes raise DltError
+
+pub fn encode_wire_parameters(Array[WireParameter], Endian, limits? : Limits, budget? : TreeBudget) -> Bytes raise DltError
 
 pub fn extract_indexed(BytesView, ArrayView[IndexEntry], framing? : Framing, limits? : Limits) -> Array[Message] raise DltError
 
@@ -61,6 +66,10 @@ pub fn query_expression(ArrayView[IndexEntry], FilterExpr, limit? : Int32, expre
 pub fn query_index(ArrayView[IndexEntry], Filter, limit? : Int32) -> Array[IndexEntry] raise DltError
 
 pub fn software_version_response(String, Endian) -> ControlResponse raise DltError
+
+pub fn wire_parameters_from_json(Json, limits? : Limits, budget? : TreeBudget) -> Array[WireParameter] raise DltError
+
+pub fn wire_parameters_to_json(Array[WireParameter], limits? : Limits, budget? : TreeBudget) -> Json raise DltError
 
 // Errors
 pub(all) suberror DltError {
@@ -232,6 +241,14 @@ pub(all) struct FixedPoint {
   offset : Int64
 } derive(Eq, @debug.Debug)
 
+pub(all) enum FloatParts {
+  Zero(Bool)
+  Subnormal(Bool, @bigint.BigInt, Int32)
+  Normal(Bool, @bigint.BigInt, Int32)
+  Infinity(Bool)
+  Nan(Bool, @bigint.BigInt)
+} derive(Eq, @debug.Debug)
+
 pub(all) enum Framing {
   Network
   Storage
@@ -307,6 +324,7 @@ pub fn Message::control_request(Self) -> ControlRequest raise DltError
 pub fn Message::control_response(Self) -> ControlResponse raise DltError
 pub fn Message::effective_ecu(Self) -> String?
 pub fn Message::from_json(Json, limits? : Limits) -> Self raise DltError
+pub fn Message::from_typed_json(Json, limits? : Limits, budget? : TreeBudget) -> Self raise DltError
 pub fn Message::new(Header, Bytes, storage? : StorageHeader) -> Self
 pub fn Message::nonverbose_id(Self) -> UInt32 raise DltError
 pub fn Message::parameters(Self, limits? : Limits) -> Array[VerboseParameter] raise DltError
@@ -314,8 +332,11 @@ pub fn Message::schema_key(Self) -> SchemaKey raise DltError
 pub fn Message::storage_microseconds(Self) -> UInt64? raise DltError
 pub fn Message::stream_key(Self) -> StreamKey
 pub fn Message::to_json(Self) -> Json
+pub fn Message::to_typed_json(Self, limits? : Limits, budget? : TreeBudget) -> Json raise DltError
+pub fn Message::wire_parameters(Self, limits? : Limits, budget? : TreeBudget) -> Array[WireParameter] raise DltError
 pub fn Message::with_arguments(Header, Array[Argument], storage? : StorageHeader, limits? : Limits) -> Self raise DltError
 pub fn Message::with_parameters(Header, Array[VerboseParameter], storage? : StorageHeader, limits? : Limits) -> Self raise DltError
+pub fn Message::with_wire_parameters(Header, Array[WireParameter], storage? : StorageHeader, limits? : Limits, budget? : TreeBudget) -> Self raise DltError
 
 pub(all) struct NamedValue {
   name : String
@@ -528,6 +549,12 @@ pub fn TimeWindow::new(UInt64, UInt64) -> Self raise DltError
 
 type TimelineState
 
+pub(all) struct TreeBudget {
+  depth : Int32
+  nodes : Int32
+} derive(Eq, @debug.Debug)
+pub fn TreeBudget::default() -> Self
+
 pub(all) struct VariableInfo {
   name : String
   unit : String?
@@ -547,6 +574,14 @@ pub fn VerboseParameter::scalar(Argument, variable? : VariableInfo, scaling? : F
 pub fn VerboseParameter::section(Self, Array[Int32], Array[Int32], steps? : Array[Int32], limits? : Limits) -> Self raise DltError
 pub fn VerboseParameter::to_json(Self) -> Json
 
+pub(all) struct WideBits {
+  high : UInt64
+  low : UInt64
+} derive(Eq, @debug.Debug)
+pub fn WideBits::float_parts(Self, width~ : Int32) -> FloatParts raise DltError
+pub fn WideBits::from_decimal(String, width? : Int32, signed? : Bool) -> Self raise DltError
+pub fn WideBits::integer(Self, width~ : Int32, signed~ : Bool) -> @bigint.BigInt raise DltError
+
 pub struct WindowSource {
   backing : Source
   window_bytes : Int32
@@ -561,6 +596,28 @@ pub fn WindowSource::cache_hits(Self) -> UInt64
 pub fn WindowSource::invalidate(Self) -> Unit
 pub fn WindowSource::new(Source, window_bytes? : Int32) -> Self raise DltError
 pub fn WindowSource::read(Self, UInt64, Int32) -> Bytes raise DltError
+
+pub(all) struct WireNumeric {
+  kind : NumericType
+  dimensions : Array[Int32]
+  elements : Array[WideBits]
+  variable : VariableInfo?
+  scaling : WireScaling?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum WireParameter {
+  Numeric(WireNumeric)
+  StringParameter(TextEncoding, String, String?)
+  RawValue(Bytes, String?)
+  TraceInfo(TextEncoding, String)
+  Structure(String?, Array[WireParameter])
+} derive(Eq, @debug.Debug)
+
+pub(all) struct WireScaling {
+  quantization_bits : UInt32
+  offset_bits : WideBits
+} derive(Eq, @debug.Debug)
+pub fn WireScaling::logical(Self, WideBits, width~ : Int32, signed~ : Bool) -> (@bigint.BigInt, Int32) raise DltError
 
 // Type aliases
 

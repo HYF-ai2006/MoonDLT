@@ -9,11 +9,15 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const cli = path.join(root, '_build/js/debug/build/cmd/node/node.js');
 
 function usage() {
-  throw new Error('Usage: node scripts/moondlt.mjs inspect INPUT [--filter EXPR] [--limit 100]\n       node scripts/moondlt.mjs extract INPUT OUTPUT [--filter EXPR]');
+  throw new Error('Usage: node scripts/moondlt.mjs inspect INPUT [--filter EXPR] [--limit 100]\n       node scripts/moondlt.mjs extract INPUT OUTPUT [--filter EXPR]\n       node scripts/moondlt.mjs decode RECORD.dlt [MODEL.json]\n       node scripts/moondlt.mjs encode MODEL.json RECORD.dlt');
 }
 
 function options(args) {
   const [operation, input, ...rest] = args;
+  if (operation === 'decode' || operation === 'encode') {
+    if (!input || rest.length > 1 || (operation === 'encode' && rest.length !== 1)) usage();
+    return { operation, input: path.resolve(input), output: rest[0] && path.resolve(rest[0]) };
+  }
   if (!['inspect', 'extract'].includes(operation) || !input) usage();
   let output;
   if (operation === 'extract') {
@@ -63,6 +67,32 @@ async function main() {
     const initial = fs.fstatSync(inputFd, { bigint: true });
     if (!initial.isFile()) throw new Error('Input must be a regular file');
     if (initial.size > 0xffffffffffffffffn) throw new Error('Input size exceeds UInt64');
+    if (settings.operation === 'decode' || settings.operation === 'encode') {
+      const decoding = settings.operation === 'decode';
+      const budget = decoding ? 65551n : 8n * 1024n * 1024n;
+      if (initial.size > budget) throw new Error('Single-record input exceeds its size limit');
+      const input = Buffer.alloc(Number(initial.size));
+      let bytesRead = 0;
+      while (bytesRead < input.length) {
+        const count = fs.readSync(inputFd, input, bytesRead, input.length - bytesRead, bytesRead);
+        if (!count) throw new Error('Short input read');
+        bytesRead += count;
+      }
+      const current = fs.fstatSync(inputFd, { bigint: true });
+      if (current.size !== initial.size || current.mtimeNs !== initial.mtimeNs) throw new Error('Input changed during read');
+      const report = JSON.parse(decoding ? library.decode_record(input) :
+        library.encode_record(new TextDecoder('utf-8', { fatal: true }).decode(input)));
+      if (!report.success) throw new Error(report.error);
+      const data = decoding ? JSON.stringify(report.message, null, 2) + '\n' : Buffer.from(report.hex, 'hex');
+      if (settings.output) {
+        outputFd = fs.openSync(settings.output, 'wx');
+        createdOutput = true;
+        fs.writeFileSync(outputFd, data);
+        fs.fsyncSync(outputFd);
+      } else process.stdout.write(data);
+      completed = true;
+      return;
+    }
     if (settings.operation === 'extract') {
       // Exclusive creation: existing recordings are never overwritten.
       outputFd = fs.openSync(settings.output, 'wx');

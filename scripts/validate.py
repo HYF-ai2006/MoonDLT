@@ -86,6 +86,7 @@ def main() -> None:
         ("independent_interop", [sys.executable, "scripts/interop.py"]),
         ("seeded_interop", [sys.executable, "scripts/test_interop_random.py"]),
         ("file_cli", [sys.executable, "scripts/test_file_cli.py"]),
+        ("review_record", [sys.executable, "scripts/test_review_record.py"] + (["--rust"] if shutil.which("cargo") else [])),
     ]
     if arguments.release_tests:
         commands.extend([

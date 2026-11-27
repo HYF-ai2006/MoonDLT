@@ -397,52 +397,10 @@ fn read_argument_value(
   endian : Endian,
   limits : Limits,
 ) -> (Argument, Int32) raise DltError {
-  let base = check_scalar_type_word(info, pos - 4)
-  if base == 0x10U {
-    guard (info & 15U) == 1U else {
-      raise Invalid(pos - 4, "Boolean must use 8-bit width")
-    }
-    require_range(data, pos, 1)
-    guard data[pos] == b'\x00' || data[pos] == b'\x01' else {
-      raise Invalid(pos, "Boolean value must be zero or one")
-    }
-    (Boolean(data[pos] == b'\x01'), pos + 1)
-  } else if base == 0x20U || base == 0x40U {
-    let width = word_width(info, pos - 4)
-    let raw = read_integer_bits(data, pos, width, endian)
-    let value = if base == 0x20U {
-      Signed(width, signed_integer_value(raw, width))
-    } else {
-      Unsigned(width, raw)
-    }
-    (value, pos + width / 8)
-  } else if base == 0x80U {
-    let width = word_width(info, pos - 4)
-    let value = if width == 32 {
-      Float::reinterpret_from_uint(read_u32(data, pos, endian)).to_double()
-    } else if width == 64 {
-      read_u64(data, pos, endian).reinterpret_as_double()
-    } else {
-      raise Unsupported(pos - 4, "unsupported IEEE floating-point width")
-    }
-    (Floating(width, value), pos + width / 8)
-  } else if base == 0x200U {
-    let encoding = match info & 0x38000U {
-      0U => Ascii
-      0x8000U => Utf8
-      _ => raise Unsupported(pos - 4, "unsupported string character encoding")
-    }
-    let length = read_u16(data, pos, endian)
-    (
-      Text(encoding, read_text_value(data, pos + 2, length, encoding, limits)),
-      pos + 2 + length,
-    )
-  } else {
-    let length = read_u16(data, pos, endian)
-    guard length <= limits.string_bytes else {
-      raise Limit(pos, "raw parameter exceeds maximum")
-    }
-    require_range(data, pos + 2, length)
-    (Raw(data[pos + 2:pos + 2 + length].to_owned()), pos + 2 + length)
+  ignore(check_scalar_type_word(info, pos - 4))
+  let (p, end) = decode_one_parameter(data, pos - 4, endian, limits)
+  match p.value {
+    Scalar(value) => (value, end)
+    _ => raise Invalid(pos - 4, "expected scalar argument")
   }
 }

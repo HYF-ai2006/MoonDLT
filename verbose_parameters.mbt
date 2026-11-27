@@ -172,32 +172,6 @@ fn numeric_type_word(kind : NumericType) -> UInt32 raise DltError {
 }
 
 ///|
-fn numeric_type_from_word(
-  info : UInt32,
-  at : Int32,
-) -> NumericType raise DltError {
-  let base = check_scalar_type_word(info, at)
-  let width = word_width(info, at)
-  if base == 0x10U {
-    guard width == 8 else {
-      raise Invalid(at, "Boolean array requires 8-bit width")
-    }
-    Bool8
-  } else if base == 0x20U {
-    IntValue(width)
-  } else if base == 0x40U {
-    UIntValue(width)
-  } else if base == 0x80U {
-    guard width == 32 || width == 64 else {
-      raise Unsupported(at, "unsupported floating array width")
-    }
-    FloatValue(width)
-  } else {
-    raise Unsupported(at, "only Boolean and numeric arrays are supported")
-  }
-}
-
-///|
 fn numeric_type_width(kind : NumericType) -> Int32 raise DltError {
   ignore(numeric_type_word(kind))
   match kind {
@@ -459,110 +433,91 @@ fn decode_one_parameter(
   limits : Limits,
 ) -> (VerboseParameter, Int32) raise DltError {
   let info = read_u32(data, at, endian)
-  guard (info & 0x6000U) == 0U else {
-    raise Unsupported(at, "trace-info and struct parameters are unsupported")
+  guard (info & 0xFFFC6000U) == 0U else {
+    raise Unsupported(
+      at, "type requires the wire parameter API or a future version",
+    )
   }
-  let scalar_info = info & 0xFFFFE6FFU
-  let base = check_scalar_type_word(scalar_info, at)
-  let has_variable = (info & 0x800U) != 0U
-  let is_array = (info & 0x100U) != 0U
-  let has_scaling = (info & 0x1000U) != 0U
-  if has_scaling {
-    guard base == 0x20U || base == 0x40U else {
-      raise Invalid(
-        at, "fixed point is legal only for signed/unsigned integers",
-      )
-    }
-  }
-  let mut pos = at + 4
-  if is_array {
-    let kind = numeric_type_from_word(scalar_info, at)
-    let dimension_count = read_u16(data, pos, endian)
-    pos += 2
-    guard dimension_count > 0 && dimension_count <= 16 else {
-      raise Limit(pos - 2, "array requires one to sixteen dimensions")
-    }
-    let dimensions : Array[Int32] = []
-    for _ in 0..<dimension_count {
-      dimensions.push(read_u16(data, pos, endian))
-      pos += 2
-    }
-    let width = numeric_type_width(kind)
-    let count = dimensions_count(dimensions, width, limits)
-    let variable = if has_variable {
-      let (variable, next) = read_metadata(data, pos, true, endian, limits)
-      pos = next
-      Some(variable)
+  let base = info & 0x6F0U
+  if base == 0x200U || base == 0x400U {
+    let scalar = info & 0xFFFFF7FFU
+    ignore(check_scalar_type_word(scalar, at))
+    let length = read_u16(data, at + 4, endian)
+    let mut pos = at + 6
+    let variable = if (info & 0x800U) != 0U {
+      let (varinfo, end) = read_metadata(data, pos, false, endian, limits)
+      pos = end
+      Some(varinfo)
     } else {
       None
     }
-    let scaling = if has_scaling {
-      let (scaling, next) = read_scaling(data, pos, scalar_info, endian)
-      pos = next
-      Some(scaling)
-    } else {
-      None
-    }
-    require_range(data, pos, count * width)
-    let values : Array[Argument] = []
-    for _ in 0..<count {
-      let (value, next) = read_argument_value(
-        data, pos, scalar_info, endian, limits,
-      )
-      values.push(value)
-      pos = next
-    }
-    ({ value: NumericArray(kind, dimensions, values), variable, scaling, }, pos)
-  } else if base == 0x200U || base == 0x400U {
-    let length = read_u16(data, pos, endian)
-    pos += 2
-    let variable = if has_variable {
-      let (variable, next) = read_metadata(data, pos, false, endian, limits)
-      pos = next
-      Some(variable)
-    } else {
-      None
-    }
-    let arg = if base == 0x200U {
-      let encoding = match scalar_info & 0x38000U {
-        0U => Ascii
-        0x8000U => Utf8
-        _ => raise Unsupported(at, "unsupported string character encoding")
-      }
-      Text(encoding, read_text_value(data, pos, length, encoding, limits))
+    let arg : Argument = if base == 0x200U {
+      let enc = wire_encoding(info, at)
+      Text(enc, read_text_value(data, pos, length, enc, limits))
     } else {
       guard length <= limits.string_bytes else {
-        raise Limit(pos, "raw parameter exceeds maximum")
+        raise Limit(pos, "raw exceeds byte budget")
       }
       require_range(data, pos, length)
       Raw(data[pos:pos + length].to_owned())
     }
     ({ value: Scalar(arg), variable, scaling: None, }, pos + length)
   } else {
-    let variable = if has_variable {
-      let (variable, next) = read_metadata(
-        data,
-        pos,
-        base != 0x10U,
-        endian,
-        limits,
-      )
-      pos = next
-      Some(variable)
-    } else {
-      None
+    let (wire, end) = read_wire_numeric(data, at, info, endian, limits)
+    guard wire is Numeric(n) else {
+      raise Invalid(at, "expected numeric parameter")
     }
-    let scaling = if has_scaling {
-      let (scaling, next) = read_scaling(data, pos, scalar_info, endian)
-      pos = next
-      Some(scaling)
-    } else {
-      None
-    }
-    let (arg, next) = read_argument_value(
-      data, pos, scalar_info, endian, limits,
+    (n.legacy(at), end)
+  }
+}
+
+///|
+fn WireNumeric::legacy(
+  n : WireNumeric,
+  at : Int32,
+) -> VerboseParameter raise DltError {
+  let (_, width) = wire_number_word(n.kind)
+  guard width <= 64 && !(n.kind is FloatValue(16)) else {
+    raise Unsupported(at, "use wire_parameters for this numeric width")
+  }
+  guard n.dimensions.length() <= 16 else {
+    raise Limit(at, "legacy array rank exceeds 16")
+  }
+  let values : Array[Argument] = []
+  for bits in n.elements {
+    values.push(
+      match n.kind {
+        Bool8 => Boolean(bits.low != 0UL)
+        IntValue(_) => Signed(width, signed_integer_value(bits.low, width))
+        UIntValue(_) => Unsigned(width, bits.low)
+        FloatValue(32) =>
+          Floating(
+            32,
+            Float::reinterpret_from_uint(bits.low.to_uint()).to_double(),
+          )
+        FloatValue(_) => Floating(64, bits.low.reinterpret_as_double())
+      },
     )
-    ({ value: Scalar(arg), variable, scaling, }, next)
+  }
+  let scaling : FixedPoint? = match n.scaling {
+    None => None
+    Some(s) =>
+      Some({
+        quantization: Float::reinterpret_from_uint(s.quantization_bits),
+        offset: signed_integer_value(
+          s.offset_bits.low,
+          wire_offset_width(width),
+        ),
+      })
+  }
+  {
+    value: if n.dimensions.is_empty() {
+      Scalar(values[0])
+    } else {
+      NumericArray(n.kind, n.dimensions, values)
+    },
+    variable: n.variable,
+    scaling,
   }
 }
 
@@ -598,25 +553,6 @@ fn write_scaling(
     scaling.offset.reinterpret_as_uint64(),
     endian,
   )
-}
-
-///|
-fn read_scaling(
-  data : BytesView,
-  pos : Int32,
-  info : UInt32,
-  endian : Endian,
-) -> (FixedPoint, Int32) raise DltError {
-  let quantization = Float::reinterpret_from_uint(read_u32(data, pos, endian))
-  let width = word_width(info, pos)
-  let offset_width = if width <= 32 { 32 } else { 64 }
-  let raw = read_integer_bits(data, pos + 4, offset_width, endian)
-  let scaling = {
-    quantization,
-    offset: signed_integer_value(raw, offset_width),
-  }
-  validate_scaling(info, scaling)
-  (scaling, pos + 4 + offset_width / 8)
 }
 
 ///|

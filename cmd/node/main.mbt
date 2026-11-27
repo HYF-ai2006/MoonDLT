@@ -138,3 +138,31 @@ pub fn extract_file(host : Host, size : String, expression : String) -> String {
   }
   result.stringify()
 }
+
+///|
+/// Decode a single real Storage record to an editable envelope without raw payload.
+pub fn decode_record(data : Bytes) -> String {
+  let result = try {
+    let m = @dlt.decode_exact(data[:])
+    Json::object({ "success": true, "message": m.to_typed_json() })
+  } catch {
+    e => Json::object({ "success": false, "error": e.describe() })
+  }
+  result.stringify()
+}
+
+///|
+pub fn encode_record(text : String) -> String {
+  let doc = @json.parse(text) catch {
+    _ =>
+      return Json::object({ "success": false, "error": "invalid JSON document" }).stringify()
+  }
+  let result = try {
+    let message = @dlt.Message::from_typed_json(doc)
+    let bytes = @dlt.encode(message)
+    Json::object({ "success": true, "hex": @dlt.hex_encode(bytes[:]) })
+  } catch {
+    e => Json::object({ "success": false, "error": e.describe() })
+  }
+  result.stringify()
+}
