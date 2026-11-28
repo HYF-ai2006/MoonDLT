@@ -110,6 +110,14 @@ pub fn ControlResponse::interpret(
   guard body.length() <= 65530 else {
     raise Limit(5, "control response exceeds wire length")
   }
+  if self.service_id >= 4095U {
+    control_exact(body, 0)
+    return match self.status {
+      0 => Ack
+      1 | 2 | 3 => ErrorStatus(self.status)
+      _ => raise Invalid(4, "unknown application service status")
+    }
+  }
   if self.service_id == 3U {
     return match self.status {
       6 | 7 => LogInformation(read_log_information(body, self.status, endian))
@@ -308,6 +316,8 @@ pub fn ControlData::response(
       status = value
       write_u32(out, 0U, endian)
     }
+    (id, Ack) if id >= 4095U => ()
+    (id, ErrorStatus(3)) if id >= 4095U => status = 3
     (_, ErrorStatus(value)) if value == 1 || value == 2 => status = value
     (1U | 2U | 5U | 6U | 10U | 17U | 18U | 32U, Ack) => ()
     (4U, DefaultLogLevelValue(level)) => {
@@ -490,4 +500,32 @@ pub fn r19_request_status(
       }
     _ => 0
   }
+}
+
+///|
+/// Read application-assigned service bytes from a captured request.
+/// Data is interpreted only as an opaque field of the declared size.
+pub fn ControlRequest::application_data(
+  self : ControlRequest,
+  endian : Endian,
+) -> Bytes raise DltError {
+  guard self is Unknown(id, data) && id >= 4095U else {
+    raise Invalid(0, "expected an application-assigned control service")
+  }
+  guard data.length() <= 65531 else {
+    raise Limit(4, "application service body exceeds wire length")
+  }
+  let view = data[:]
+  let size = read_u32(view, 0, endian)
+  let available = (data.length() - 4).reinterpret_as_uint()
+  guard size <= available else {
+    raise Truncated(8, "application service data truncated")
+  }
+  guard size == available else {
+    raise Invalid(
+      8 + size.reinterpret_as_int(),
+      "trailing application service data",
+    )
+  }
+  view[4:].to_owned()
 }

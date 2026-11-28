@@ -4,6 +4,7 @@
 pub(all) enum ArxmlFieldType {
   StaticText(String)
   NumberField(NumericType)
+  FixedNumberField(NumericType, WireScaling)
   TextField(TextEncoding, Int32)
   OctetField(Int32)
 } derive(Eq, @debug.Debug)
@@ -45,7 +46,7 @@ pub struct ArxmlCatalog {
 fn ArxmlFieldType::width(self : ArxmlFieldType) -> Int32 raise DltError {
   match self {
     StaticText(_) => 0
-    NumberField(kind) => {
+    NumberField(kind) | FixedNumberField(kind, _) => {
       let (_, bits) = wire_number_word(kind)
       bits / 8
     }
@@ -89,8 +90,9 @@ pub fn ArxmlCatalog::new(
     }
     total_fields += entry.fields.length()
     let max_subtype = match entry.message_type {
-      0 | 2 => 6
+      0 => 6
       1 => 5
+      2 => 15
       _ => 0
     }
     guard entry.subtype >= 1 && entry.subtype <= max_subtype else {
@@ -118,8 +120,24 @@ pub fn ArxmlCatalog::new(
       if field.unit_ref is Some(unit) {
         ignore(encode_text_checked(unit, max_bytes=4096))
       }
-      if field.kind is StaticText(value) {
-        ignore(encode_text_checked(value, max_bytes=65535))
+      match field.kind {
+        StaticText(value) => {
+          guard field.unit_ref is None else {
+            raise Invalid(0, "static description cannot have a unit")
+          }
+          ignore(encode_text_checked(value, max_bytes=65535))
+        }
+        FixedNumberField(kind, scaling) => {
+          let (_, width) = wire_number_word(kind)
+          guard kind is IntValue(_) || kind is UIntValue(_) else {
+            raise Invalid(0, "ARXML fixed point requires an integer field")
+          }
+          guard (scaling.quantization_bits & 0x7F800000U) != 0x7F800000U &&
+            scaling.offset_bits.fits(wire_offset_width(width)) else {
+            raise Invalid(0, "invalid ARXML fixed-point parameters")
+          }
+        }
+        _ => ()
       }
     }
     ignore(entry.packed_length())
@@ -175,12 +193,22 @@ fn arxml_field_json(j : Json) -> ArxmlField raise DltError {
     }
     StaticText(verbose_string(verbose_field(o, "text")))
   } else {
-    verbose_fields(o, ["name", "unit_ref", "kind", "bits"])
+    let scaling = match o.get("scaling") {
+      None => {
+        verbose_fields(o, ["name", "unit_ref", "kind", "bits"])
+        None
+      }
+      Some(j) => {
+        verbose_fields(o, ["name", "unit_ref", "kind", "bits", "scaling"])
+        Some(verbose_object(j))
+      }
+    }
     let bits = verbose_small_integer(verbose_field(o, "bits"), 65531 * 8)
     guard bits > 0 && bits % 8 == 0 else {
       raise Invalid(0, "ARXML dynamic field needs a byte-aligned length")
     }
-    match verbose_string(verbose_field(o, "kind")) {
+    let plain : ArxmlFieldType = match
+      verbose_string(verbose_field(o, "kind")) {
       "bool" if bits == 8 => NumberField(Bool8)
       "signed" => NumberField(IntValue(bits))
       "unsigned" => NumberField(UIntValue(bits))
@@ -189,6 +217,25 @@ fn arxml_field_json(j : Json) -> ArxmlField raise DltError {
       "utf8" => TextField(Utf8, bits / 8)
       "raw" => OctetField(bits / 8)
       _ => raise Unsupported(0, "unsupported ARXML field type")
+    }
+    match scaling {
+      None => plain
+      Some(v) => {
+        verbose_fields(v, ["quantization_bits", "offset"])
+        guard plain is NumberField(kind) else {
+          raise Invalid(0, "ARXML scaling requires a numeric field")
+        }
+        let quantization_bits = wire_json_bits(
+          verbose_field(v, "quantization_bits"),
+          32,
+        ).low.to_uint()
+        let offset_bits = WideBits::from_decimal(
+          verbose_string(verbose_field(v, "offset")),
+          width=wire_offset_width(bits),
+          signed=true,
+        )
+        FixedNumberField(kind, { quantization_bits, offset_bits, })
+      }
     }
   }
   { name, unit_ref, kind, }
@@ -327,17 +374,21 @@ pub fn ArxmlCatalog::decode(
         ignore(encode_text_checked(value, max_bytes=limits.string_bytes))
         StringParameter(Utf8, value, Some(field.name))
       }
-      NumberField(kind) => {
+      NumberField(kind) | FixedNumberField(kind, _) => {
         let bits = read_bits(payload, offset, width * 8, message.header.endian)
         guard kind != Bool8 || bits.low <= 1UL else {
           raise Invalid(offset, "ARXML boolean must be zero or one")
+        }
+        let scaling = match field.kind {
+          FixedNumberField(_, scaling) => Some(scaling)
+          _ => None
         }
         Numeric({
           kind,
           dimensions: [],
           elements: [bits],
           variable: None,
-          scaling: None,
+          scaling,
         })
       }
       TextField(encoding, _) => {
@@ -364,6 +415,90 @@ pub fn ArxmlCatalog::decode(
     description: { ..description, fields: description.fields.copy(), },
     arguments,
   }
+}
+
+///|
+/// Reconstruct the packed payload from typed arguments. The template supplies
+/// the message ID, channel, framing metadata and byte order. Static arguments
+/// must still agree with the catalogue and do not consume payload bytes.
+pub fn ArxmlCatalog::encode(
+  self : ArxmlCatalog,
+  template : Message,
+  arguments : ArrayView[WireParameter],
+  limits~ : Limits = Limits::default(),
+) -> Message raise DltError {
+  check_limits(limits)
+  let description = self.find(template)
+  guard description.fields.length() <= limits.arguments else {
+    raise Limit(0, "ARXML argument budget exceeded")
+  }
+  guard arguments.length() == description.fields.length() else {
+    raise Invalid(0, "ARXML argument count does not match catalogue")
+  }
+  let size = description.packed_length()
+  guard size <= limits.message_bytes - template.header.wire_size() else {
+    raise Limit(0, "ARXML message exceeds byte budget")
+  }
+  let out = @buffer.Buffer::Buffer()
+  write_u32(out, description.message_id, template.header.endian)
+  for i in 0..<arguments.length() {
+    let field = description.fields[i]
+    let endian = template.header.endian
+    match (field.kind, arguments[i]) {
+      (StaticText(value), StringParameter(Utf8, text, Some(name))) => {
+        guard text == value && name == field.name else {
+          raise Invalid(
+            out.length(),
+            "static ARXML argument differs from catalogue",
+          )
+        }
+        ignore(encode_text_checked(value, max_bytes=limits.string_bytes))
+      }
+      (NumberField(kind) | FixedNumberField(kind, _), Numeric(n)) => {
+        let (_, width) = wire_number_word(kind)
+        let scaling = match field.kind {
+          FixedNumberField(_, scaling) => Some(scaling)
+          _ => None
+        }
+        guard n.kind == kind &&
+          n.dimensions.is_empty() &&
+          n.elements.length() == 1 &&
+          n.variable is None &&
+          n.scaling == scaling else {
+          raise Invalid(
+            out.length(),
+            "numeric ARXML metadata differs from catalogue",
+          )
+        }
+        let bits = n.elements[0]
+        guard bits.fits(width) && (kind != Bool8 || bits.low <= 1UL) else {
+          raise Invalid(out.length(), "invalid ARXML numeric value")
+        }
+        write_bits(out, bits, width, endian)
+      }
+      (TextField(coding, width), StringParameter(actual, text, Some(name))) if name ==
+        field.name => {
+        guard width <= limits.string_bytes else {
+          raise Limit(out.length(), "ARXML text exceeds byte budget")
+        }
+        dictionary_write_field(
+          out,
+          FixedText(coding, width),
+          Text(actual, text),
+          endian,
+        )
+      }
+      (OctetField(width), RawValue(bytes, Some(name))) if name == field.name => {
+        guard width <= limits.string_bytes else {
+          raise Limit(out.length(), "ARXML octets exceed byte budget")
+        }
+        dictionary_write_field(out, FixedBytes(width), Raw(bytes), endian)
+      }
+      _ =>
+        raise Invalid(out.length(), "ARXML argument does not match catalogue")
+    }
+  }
+  { ..template, payload: out.to_bytes(), }
 }
 
 ///|

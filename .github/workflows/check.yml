@@ -52,3 +52,5 @@ jobs:
         run: python scripts/test_review_record.py --rust
       - name: R19-11 Classic ARXML to typed nonverbose Storage
         run: python scripts/test_arxml.py
+      - name: Mooncakes archive and fresh dependency consumer
+        run: python scripts/test_public_package.py

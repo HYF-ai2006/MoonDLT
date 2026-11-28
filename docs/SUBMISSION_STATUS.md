@@ -4,6 +4,8 @@
 
 2026-11-28 复审：GitHub 源码 0.2.0 增加三项评审指出的标准载荷和实际文件复现。参赛评审以 GitHub main、[申报书](../PROPOSAL.md)、[条款矩阵](R19_11_REQUIREMENTS.md)及[当前 CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml)为依据。Mooncakes 的已发布基础版为 0.1.0。
 
+本轮验收复现入口见 [ACCEPTANCE.md](ACCEPTANCE.md)。源码可构建 Mooncakes 0.2.0 ZIP，并支持从归档安装后的独立运行核对。实际注册表版本以 Mooncakes 为准。
+
 基础版发布记录：
 
 - Mooncakes：2026-11-24 13:21（北京时间）已发布 `HYF-ai2006/moondlt@0.1.0`，注册表可查询。

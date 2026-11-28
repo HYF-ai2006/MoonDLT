@@ -6,9 +6,11 @@ processed. Only the R19-11 DLT metadata used to bind and lay out messages is imp
 from __future__ import annotations
 
 import argparse
+from fractions import Fraction
 import json
 from pathlib import Path
 import re
+import struct
 import sys
 from xml.etree import ElementTree as ET
 
@@ -16,7 +18,7 @@ NS = "{http://autosar.org/schema/r4.0}"
 MAX_XML_BYTES = 8 * 1024 * 1024
 NAMED_NODES = {
     "AR-PACKAGE", "DLT-MESSAGE-COLLECTION-SET", "DLT-MESSAGE", "SW-BASE-TYPE",
-    "UNIT", "ECU-INSTANCE", "DLT-LOG-CHANNEL",
+    "UNIT", "ECU-INSTANCE", "DLT-LOG-CHANNEL", "COMPU-METHOD",
 }
 ENCODING_KIND = {
     "2C": "signed", "NONE": "unsigned", "IEEE754": "float", "BOOLEAN": "bool",
@@ -38,11 +40,27 @@ class CatalogError(ValueError):
 
 
 class DltTreeBuilder(ET.TreeBuilder):
+    def __init__(self) -> None:
+        super().__init__()
+        self.depth = 0
+        self.elements = 0
+
+    def start(self, tag: str, attrs: dict[str, str]) -> ET.Element:
+        self.depth += 1
+        self.elements += 1
+        if self.depth > 128 or self.elements > 262_144:
+            raise CatalogError("ARXML document exceeds its nesting or element budget")
+        return super().start(tag, attrs)
+
+    def end(self, tag: str) -> ET.Element:
+        self.depth -= 1
+        return super().end(tag)
+
     def doctype(self, _name: str, _public_id: str, _system_id: str) -> None:
         raise CatalogError("DOCTYPE is not allowed in a DLT description")
 
 
-def text(node: ET.Element, tag: str, *, required: bool = True) -> str | None:
+def element(node: ET.Element, tag: str, *, required: bool = True) -> ET.Element | None:
     children = node.findall(NS + tag)
     if len(children) > 1:
         raise CatalogError(f"repeated {tag} in {node.tag}")
@@ -50,7 +68,13 @@ def text(node: ET.Element, tag: str, *, required: bool = True) -> str | None:
         if required:
             raise CatalogError(f"missing {tag} in {node.tag}")
         return None
-    child = children[0]
+    return children[0]
+
+
+def text(node: ET.Element, tag: str, *, required: bool = True) -> str | None:
+    child = element(node, tag, required=required)
+    if child is None:
+        return None
     if len(child):
         raise CatalogError(f"expected leaf text in {tag}")
     value = (child.text or "").strip()
@@ -166,13 +190,64 @@ def base_type(ref: str, bits: int, objects: dict[str, ET.Element]) -> str:
 
 
 def description(argument: ET.Element) -> str:
-    desc = argument.find(NS + "DESC")
-    if desc is None:
-        raise CatalogError("zero-length DLT-ARGUMENT requires DESC")
+    desc = element(argument, "DESC")
+    assert desc is not None
     translations = desc.findall(NS + "L-2")
     chosen = next((item for item in translations if item.get("L", "").upper() == "EN"),
                   translations[0] if translations else desc)
     return "".join(chosen.itertext()).strip()
+
+
+def coefficients(container: ET.Element, tag: str, expected: int) -> list[Fraction]:
+    node = element(container, tag)
+    assert node is not None
+    values = []
+    if len(node) != expected:
+        raise CatalogError(f"{tag} requires {expected} coefficients")
+    for child in node:
+        value = (child.text or "").strip()
+        if (child.tag != NS + "V" or len(child) or len(value) > 80 or
+                not re.fullmatch(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[Ee][+-]?[0-9]{1,3})?", value)):
+            raise CatalogError(f"invalid coefficient in {tag}")
+        values.append(Fraction(value))
+    return values
+
+
+def linear_scaling(ref: str, bits: int, objects: dict[str, ET.Element]) -> tuple[dict, str | None]:
+    method = objects.get(ref)
+    if method is None or method.tag != NS + "COMPU-METHOD":
+        raise CatalogError(f"unresolved COMPU-METHOD reference {ref}")
+    # AUTOSAR CP R19-11 Software Component Template §5.5.1.5.
+    if text(method, "CATEGORY") != "LINEAR":
+        raise CatalogError(f"unsupported COMPU-METHOD category at {ref}; expected LINEAR")
+    conversion = element(method, "COMPU-INTERNAL-TO-PHYS")
+    assert conversion is not None
+    scales = element(conversion, "COMPU-SCALES")
+    assert scales is not None
+    scale = element(scales, "COMPU-SCALE")
+    assert scale is not None
+    ratio = element(scale, "COMPU-RATIONAL-COEFFS")
+    assert ratio is not None
+    if len(scales) != 1 or len(scale) != 1:
+        raise CatalogError(f"bounded or alternative COMPU-SCALE at {ref} is unsupported")
+    intercept, slope = coefficients(ratio, "COMPU-NUMERATOR", 2)
+    [denominator] = coefficients(ratio, "COMPU-DENOMINATOR", 1)
+    if denominator == 0:
+        raise CatalogError(f"zero COMPU-DENOMINATOR at {ref}")
+    offset = intercept / denominator
+    bound = 1 << (max(bits, 32) - 1)
+    if offset.denominator != 1 or not -bound <= offset < bound:
+        raise CatalogError(f"COMPU-METHOD offset at {ref} does not fit the signed DLT field")
+    quantization = slope / denominator
+    try:
+        encoded = struct.pack(">f", float(quantization))
+        round_trip = Fraction(struct.unpack(">f", encoded)[0])
+    except (OverflowError, ValueError) as exc:
+        raise CatalogError(f"COMPU-METHOD quantization at {ref} exceeds binary32") from exc
+    if round_trip != quantization:
+        raise CatalogError(f"inexact binary32 COMPU-METHOD quantization at {ref}")
+    unit = text(method, "UNIT-REF", required=False)
+    return {"quantization_bits": encoded.hex(), "offset": str(int(offset))}, unit
 
 
 def parse_argument(argument: ET.Element, objects: dict[str, ET.Element]) -> dict:
@@ -180,29 +255,38 @@ def parse_argument(argument: ET.Element, objects: dict[str, ET.Element]) -> dict
     length = text(argument, "LENGTH")
     assert name is not None and length is not None
     bits = uint(length, "LENGTH", 65531 * 8)
+    representation = element(argument, "NETWORK-REPRESENTATION", required=bits > 0)
     if bits == 0:
-        if argument.find(NS + "NETWORK-REPRESENTATION") is not None:
+        if representation is not None:
             raise CatalogError(f"static argument {name} also specifies a network representation")
         return {"name": name, "unit_ref": None, "kind": "static", "text": description(argument)}
     if bits % 8 != 0:
         raise CatalogError(f"DLT-ARGUMENT {name} is not byte aligned")
-    representation = argument.find(NS + "NETWORK-REPRESENTATION")
-    if representation is None:
-        raise CatalogError(f"missing NETWORK-REPRESENTATION for {name}")
+    assert representation is not None
     alternatives = representation.findall(".//" + NS + "SW-DATA-DEF-PROPS-CONDITIONAL")
     if len(alternatives) > 1:
         raise CatalogError(f"multiple network representations for {name}")
     info = alternatives[0] if alternatives else representation
-    for feature in ("COMPU-METHOD-REF", "DATA-CONSTR-REF", "SW-RECORD-LAYOUT-REF",
-                    "BYTE-ORDER", "SW-BIT-REPRESENTATION"):
-        if info.find(".//" + NS + feature) is not None:
+    for feature in ("DATA-CONSTR-REF", "SW-RECORD-LAYOUT-REF", "BYTE-ORDER", "SW-BIT-REPRESENTATION"):
+        if representation.find(".//" + NS + feature) is not None:
             raise CatalogError(f"unsupported {feature} in {name}")
     ref = text(info, "BASE-TYPE-REF")
     assert ref is not None
     kind = base_type(path_ref(ref, "BASE-TYPE-REF"), bits, objects)
     unit = text(info, "UNIT-REF", required=False)
-    return {"name": name, "unit_ref": path_ref(unit, "UNIT-REF") if unit else None,
-            "kind": kind, "bits": bits}
+    calculation = text(info, "COMPU-METHOD-REF", required=False)
+    field = {"name": name, "unit_ref": None, "kind": kind, "bits": bits}
+    if calculation:
+        if kind not in ("signed", "unsigned"):
+            raise CatalogError(f"DLT fixed-point metadata requires an integer field ({name})")
+        scaling, method_unit = linear_scaling(path_ref(calculation, "COMPU-METHOD-REF"), bits, objects)
+        if unit and method_unit and unit != method_unit:
+            raise CatalogError(f"UNIT-REF differs from COMPU-METHOD at {calculation}")
+        unit = unit or method_unit
+        field["scaling"] = scaling
+    if unit:
+        field["unit_ref"] = path_ref(unit, "UNIT-REF")
+    return field
 
 
 def parse_message(node: ET.Element, objects: dict[str, ET.Element]) -> dict:

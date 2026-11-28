@@ -2,7 +2,7 @@
 /// Passive codec for DLT v1 control services. It never opens a connection or
 /// sends requests. Unknown service bodies remain available without interpretation.
 /// Per-context services accept -1 to select the configured default (0xff).
-/// Services that set the default itself require a concrete level/status.
+/// For SetDefaultLogLevel, -1 means all log levels pass (R19-11 §5.3.8).
 pub(all) enum ControlRequest {
   SetLogLevel(String, String, Int32, String)
   SetTraceStatus(String, String, Int32, String)
@@ -125,7 +125,7 @@ pub fn encode_control_request(
       write_id(out, interface)
     }
     SetDefaultLogLevel(level, interface) => {
-      control_default_level(level, false)
+      control_level(level, false)
       out.write_byte(level.to_byte())
       write_id(out, interface)
     }
@@ -233,7 +233,7 @@ pub fn decode_control_request(
     17U => {
       control_exact(data, 9)
       let level = control_byte(data[4])
-      control_default_level(level, false)
+      control_level(level, false)
       SetDefaultLogLevel(level, read_id(data, 5))
     }
     18U => {

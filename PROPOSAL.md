@@ -14,12 +14,12 @@
 - **非 verbose 日志还原与联测。** 测试工程师提供 Classic ARXML 描述和无扩展头的 DLT 文件，从 Message ID 恢复应用上下文、源码位置、静态文字及动态测量值。验收大小端还原一致，缺少描述或匹配歧义明确报错，并用合成报文验证控制通知的解析结果。
 
 **5、核心功能与阶段验收**
-- **第一阶段已实现。** 在已发布 0.1.0 的三种封装、分片与筛选能力上，增加嵌套 STRU、ASCII/UTF-8 TRAI、有符号及无符号 128 位、binary16/binary128、宽 FIXP、标准数值数组与可编辑 JSON。当前严格有效核心代码为 5,783 行。大小端 Storage 样例解码出 `boot` 与精确的 `2⁹⁶＋1`，将文本改为 `ready` 后，载荷由 37 变 38 字节，计数原值保留。220 例按规范独立构造的组合覆盖双端序，`dlt_parse 0.10.1` 双向核对双方支持的小端高级类型。
-- **第二阶段已有实现与用例。** Classic ARXML 固定位宽字段可还原无扩展头记录。标准控制入口覆盖保留位、NOAR、GetLogInfo 条件列表、通道状态、同步时间和溢出通知，已用字节向量核验。进一步以外部样本交叉核对 ARXML 布局及 GetLogInfo 状态 7 的控制格式。
-- **最终验收。** 按 R19-11 第 5 章 161 个条款编号记录适用条件和证据。补齐多配置的 non-verbose 描述测试，以及模拟宿主中配置生效、应用通知、定时同步、溢出节流和发送重试等行为。最终提交逐条运行结果、双向互操作样例和跨目标 CI。 [条款与验收矩阵](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/R19_11_REQUIREMENTS.md)
+- **第一阶段已实现。** 在已发布 0.1.0 的三种封装、分片与筛选能力上，增加嵌套 STRU、ASCII/UTF-8 TRAI、有符号及无符号 128 位、binary16/binary128、宽 FIXP、标准数值数组与可编辑 JSON。核心有效 MoonBit 代码为 6,437 行。大小端 Storage 样例解码出 `boot` 与精确的 `2⁹⁶＋1`，将文本改为 `ready` 后，载荷由 37 变 38 字节，计数原值保留。220 例按规范独立构造的组合覆盖双端序，`dlt_parse 0.10.1` 双向核对双方支持的小端高级类型。
+- **第二阶段已有实现与用例。** Classic ARXML 可从无扩展头记录恢复定宽字段、静态文本和可精确表示的线性定点，并按描述重新编码。标准控制入口覆盖保留位、NOAR、GetLogInfo 条件列表、通道状态、同步时间和溢出通知，已用字节向量核验。离线宿主已验证配置、应用通知、通道过滤、计数回绕、定时同步、溢出节流以及有限重试。
+- **最终验收。** 按 R19-11 第 5 章 161 个条款编号记录适用条件和证据。用现有跨目标 CI、离线宿主事件重放与独立包消费验证可复现性。复杂 ARXML 布局、GetLogInfo 状态 7 的额外外部对照与部署相关应用行为继续逐条验收。 [条款与验收矩阵](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/R19_11_REQUIREMENTS.md)
 
 **6、项目性质**　参考协议标准与现有开源实现的原创项目。MoonBit 核心自行编写，AI 辅助及数据来源已披露。项目采用 Apache-2.0。 [来源说明](https://github.com/HYF-ai2006/MoonDLT/blob/main/THIRD_PARTY.md)
 
 **7、参考项目与许可证**　协议和能力对照采用 COVESA dlt-daemon（MPL-2.0，按文件声明）、esrlabs/dlt-core（Apache-2.0）。验证依赖为 pydlt 0.3.5（MIT）和 dlt_parse 0.10.1（MIT OR Apache-2.0）。没有移植上游源码。 [来源、链接与使用范围](https://github.com/HYF-ai2006/MoonDLT/blob/main/THIRD_PARTY.md)
 
-**8、仓库与提交**　公开仓库默认分支为 `main`。已有 10 次实质提交逐条列证，复审新增实现与回归测试可从后续提交和 CI 核查。 [GitHub 仓库](https://github.com/HYF-ai2006/MoonDLT) · [有效提交](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/SUBMISSION_REQUIREMENTS_CHECK.md) · [GitHub CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml) · [Mooncakes 已发布基础版 0.1.0](https://mooncakes.io/docs/HYF-ai2006/moondlt)
+**8、仓库与提交**　公开仓库默认分支为 `main`。已有 10 次实质提交逐条列证，复审新增实现与回归测试可从后续提交和 CI 核查。 [GitHub 仓库](https://github.com/HYF-ai2006/MoonDLT) · [有效提交](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/SUBMISSION_REQUIREMENTS_CHECK.md) · [验收复现](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/ACCEPTANCE.md) · [GitHub CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml) · [Mooncakes 已发布基础版 0.1.0](https://mooncakes.io/docs/HYF-ai2006/moondlt)

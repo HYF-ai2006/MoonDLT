@@ -1,29 +1,37 @@
 ///|
-test "default control services cannot select an implicit default" {
+test "R19-11 default log level accepts all-pass while default trace uses concrete states" {
   for endian in [Little, Big] {
-    for request in [SetDefaultLogLevel(-1, ""), SetDefaultTraceStatus(-1, "")] {
-      assert_true(
-        try {
-          ignore(encode_control_request(request, endian))
-          false
-        } catch {
-          _ => true
-        },
-      )
+    let request = SetDefaultLogLevel(-1, "")
+    let message = request.standard_message(Header::new(endian~))
+    let expected = if endian == Big {
+      "00000011ff00000000"
+    } else {
+      "11000000ff00000000"
     }
-    for service in [17U, 18U] {
-      let bytes = @buffer.Buffer::Buffer()
-      write_u32(bytes, service, endian)
-      bytes.write_bytes(b"\xff\x00\x00\x00\x00"[:])
-      assert_true(
-        try {
-          ignore(decode_control_request(bytes.to_bytes()[:], endian))
-          false
-        } catch {
-          _ => true
-        },
-      )
-    }
+    assert_eq(hex_encode(message.payload[:]), expected)
+    assert_eq(message.standard_control_request(), request)
+    assert_eq(decode_control_request(message.payload[:], endian), request)
+    assert_true(
+      try {
+        ignore(encode_control_request(SetDefaultTraceStatus(-1, ""), endian))
+        false
+      } catch {
+        Invalid(_, _) => true
+        _ => false
+      },
+    )
+    let bytes = @buffer.Buffer::Buffer()
+    write_u32(bytes, 18U, endian)
+    bytes.write_bytes(b"\xff\x00\x00\x00\x00"[:])
+    assert_true(
+      try {
+        ignore(decode_control_request(bytes.to_bytes()[:], endian))
+        false
+      } catch {
+        Invalid(_, _) => true
+        _ => false
+      },
+    )
     for
       request in [
         SetLogLevel("APP", "CTX", -1, ""),

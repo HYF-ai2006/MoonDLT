@@ -56,3 +56,38 @@ test "strict R19 validation distinguishes reserved and user-defined subtypes" {
   )
   assert_eq(read.payload, net.payload)
 }
+
+///|
+test "source location is the first two verbose parameters with the specified VARI names" {
+  let items = r19_source_location_parameters("file:///model.c", 42U)
+  items.push(TraceInfo(Ascii, "startup"))
+  let message = Message::with_wire_parameters(review_header(Little), items)
+  message.validate_r19()
+  let parameters = message.wire_parameters()
+  guard parameters
+    is [
+      StringParameter(Utf8, "file:///model.c", Some("source_file")),
+      Numeric(line),
+      TraceInfo(Ascii, "startup"),
+    ] else {
+    fail("source location and event parameters changed order or kind")
+  }
+  assert_eq(line.kind, UIntValue(32))
+  assert_eq(line.variable, Some({ name: "line_number", unit: Some(""), }))
+  assert_eq(line.elements[0].low, 42UL)
+  assert_eq(message.header.extended.unwrap().argument_count, 3)
+}
+
+///|
+test "strict validation checks tree settings even for nonverbose records" {
+  let message = control_request_message(GetDefaultTraceStatus, Header::new())
+  assert_true(
+    try {
+      message.validate_r19(budget={ depth: -1, nodes: 1, })
+      false
+    } catch {
+      Invalid(_, _) => true
+      _ => false
+    },
+  )
+}

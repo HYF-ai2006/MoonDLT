@@ -69,6 +69,8 @@ pub fn query_index(ArrayView[IndexEntry], Filter, limit? : Int32) -> Array[Index
 
 pub fn r19_request_status(ControlRequest, busy? : Bool, valid_configuration? : Bool, filtering_supported? : Bool) -> Int32
 
+pub fn r19_source_location_parameters(String, UInt32) -> Array[WireParameter]
+
 pub fn software_version_response(String, Endian) -> ControlResponse raise DltError
 
 pub fn wire_parameters_from_json(Json, limits? : Limits, budget? : TreeBudget) -> Array[WireParameter] raise DltError
@@ -107,6 +109,7 @@ pub struct ArxmlCatalog {
   count : Int32
 }
 pub fn ArxmlCatalog::decode(Self, Message, limits? : Limits) -> ArxmlDecoded raise DltError
+pub fn ArxmlCatalog::encode(Self, Message, ArrayView[WireParameter], limits? : Limits) -> Message raise DltError
 pub fn ArxmlCatalog::from_json(Json) -> Self raise DltError
 pub fn ArxmlCatalog::length(Self) -> Int32
 pub fn ArxmlCatalog::new(Array[ArxmlDescription]) -> Self raise DltError
@@ -138,6 +141,7 @@ pub(all) struct ArxmlField {
 pub(all) enum ArxmlFieldType {
   StaticText(String)
   NumberField(NumericType)
+  FixedNumberField(NumericType, WireScaling)
   TextField(TextEncoding, Int32)
   OctetField(Int32)
 } derive(Eq, @debug.Debug)
@@ -228,6 +232,7 @@ pub(all) enum ControlRequest {
   GetLogChannelThreshold(String)
   Unknown(UInt32, Bytes)
 } derive(Eq, @debug.Debug)
+pub fn ControlRequest::application_data(Self, Endian) -> Bytes raise DltError
 pub fn ControlRequest::canonical_bytes(Self, Endian) -> Bytes raise DltError
 pub fn ControlRequest::service_id(Self) -> UInt32
 pub fn ControlRequest::standard_message(Self, Header, storage? : StorageHeader, limits? : Limits) -> Message raise DltError
@@ -447,6 +452,93 @@ pub(all) enum NumericType {
 pub(all) enum ParameterValue {
   Scalar(Argument)
   NumericArray(NumericType, Array[Int32], Array[Argument])
+} derive(Eq, @debug.Debug)
+
+pub(all) struct R19ChannelConfig {
+  name : String
+  log_level : Int32
+  trace : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) struct R19ContextChange {
+  application : String
+  context : String
+  log_level : Int32
+  trace : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) struct R19ContextConfig {
+  application : String
+  context : String
+  log_level : Int32?
+  trace : Bool?
+  channels : Array[String]
+  application_description : Bytes
+  context_description : Bytes
+} derive(Eq, @debug.Debug)
+
+pub(all) struct R19ControlResult {
+  response : ControlResponse
+  changed : Array[R19ContextChange]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct R19Delivery {
+  channel : String
+  counter : Int32
+  attempts : Int32
+  accepted : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) enum R19EnqueueResult {
+  Filtered
+  Queued(Int32)
+  Overflowed(Int32)
+} derive(Eq, @debug.Debug)
+
+pub struct R19Host {
+  factory : R19HostConfig
+  mut config : R19HostConfig
+  software_version : String
+  options : R19HostOptions
+  queue : Array[R19Pending]
+  mut bytes : Int32
+  mut counter : Int32
+  mut loss : UInt32
+  mut last_overflow : UInt64?
+  mut last_sync : UInt64?
+  mut last_sync_available : Bool
+  mut last_poll : UInt64?
+  mut busy : Bool
+}
+pub fn R19Host::configuration(Self) -> R19HostConfig
+pub fn R19Host::control(Self, ControlRequest, Endian, busy? : Bool, save? : (R19HostConfig) -> Bool) -> R19ControlResult raise DltError
+pub fn R19Host::drain_one(Self, (String, Message) -> Bool) -> R19Delivery?
+pub fn R19Host::enqueue(Self, String, Message) -> R19EnqueueResult raise DltError
+pub fn R19Host::new(R19HostConfig, software_version~ : String, options? : R19HostOptions) -> Self raise DltError
+pub fn R19Host::poll(Self, UInt64, Endian, wall_time? : R19WallTime, clock_jump? : Bool) -> Array[ControlResponse] raise DltError
+
+pub(all) struct R19HostConfig {
+  default_log_level : Int32
+  default_trace : Bool
+  filtering : Bool
+  contexts : Array[R19ContextConfig]
+  channels : Array[R19ChannelConfig]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct R19HostOptions {
+  queue_records : Int32
+  queue_bytes : Int32
+  overflow_interval_ms : UInt64
+  retries : Int32
+  filtering_supported : Bool
+} derive(Eq, @debug.Debug)
+pub fn R19HostOptions::default() -> Self
+
+type R19Pending
+
+pub(all) struct R19WallTime {
+  seconds : UInt64
+  nanoseconds : UInt32
 } derive(Eq, @debug.Debug)
 
 pub(all) enum Relation {

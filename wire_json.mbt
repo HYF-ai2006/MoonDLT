@@ -152,7 +152,8 @@ pub fn wire_parameters_to_json(
 fn json_number_value(
   o : Map[String, Json],
   tag : String,
-  limits : Limits,
+  remaining : Int32,
+  offset : Int32,
 ) -> WireNumeric raise DltError {
   verbose_fields(o, [
     "type", "width", "dimensions", "values", "variable", "scaling",
@@ -167,14 +168,25 @@ fn json_number_value(
   }
   ignore(wire_number_word(kind))
   let sizes = verbose_array(verbose_field(o, "dimensions"))
-  guard sizes.length() <= limits.message_bytes / 2 else {
-    raise Limit(0, "array rank exceeds budget")
+  guard remaining >= 4 && sizes.length() <= (remaining - 4) / 2 else {
+    raise Limit(offset, "array rank exceeds remaining payload")
   }
   let dimensions = []
   for d in sizes {
     dimensions.push(verbose_small_integer(d, 65535))
   }
-  let count = wire_shape_count(dimensions, width / 8, limits, 0)
+  let shape_bytes = if dimensions.is_empty() {
+    4
+  } else {
+    6 + 2 * dimensions.length()
+  }
+  guard shape_bytes <= remaining else {
+    raise Limit(offset, "numeric shape exceeds remaining payload")
+  }
+  let count = wire_shape_count(dimensions, width / 8, remaining, offset)
+  guard count <= (remaining - shape_bytes) / (width / 8) else {
+    raise Limit(offset, "numeric data exceeds remaining payload")
+  }
   let values = verbose_array(verbose_field(o, "values"))
   guard values.length() == count else {
     raise Invalid(0, "JSON number count disagrees with dimensions")
@@ -242,8 +254,19 @@ pub fn wire_parameters_from_json(
   limits~ : Limits = Limits::default(),
   budget~ : TreeBudget = TreeBudget::default(),
 ) -> Array[WireParameter] raise DltError {
+  wire_parameters_from_json_bounded(json, limits, budget, limits.message_bytes)
+}
+
+///|
+fn wire_parameters_from_json_bounded(
+  json : Json,
+  limits : Limits,
+  budget : TreeBudget,
+  maximum : Int32,
+) -> Array[WireParameter] raise DltError {
   check_limits(limits)
   check_tree_budget(budget)
+  guard maximum >= 0 else { raise Limit(2, "no room for verbose payload") }
   let input = verbose_array(json)
   guard input.length() <= limits.arguments && input.length() <= budget.nodes else {
     raise Limit(0, "JSON top-level count exceeded")
@@ -313,20 +336,25 @@ pub fn wire_parameters_from_json(
           verbose_fields(o, ["type", "hex", "name"])
           let s = verbose_string(verbose_field(o, "hex"))
           guard s.length() <= limits.string_bytes * 2 &&
-            s.length() <= 2 * (limits.message_bytes - bytes) else {
+            s.length() <= 2 * (maximum - bytes) else {
             raise Limit(bytes, "JSON raw data exceeds budget")
           }
           RawValue(hex_decode(s), wire_optional_text(verbose_field(o, "name")))
         }
-        _ => Numeric(json_number_value(o, tag, limits))
+        _ => Numeric(json_number_value(o, tag, maximum - bytes, bytes))
       }
       // Per-leaf preflight bounds construction even if many huge JSON siblings
       // are supplied to an otherwise tiny wire budget.
-      let leaf_limits = { ..limits, arguments: 255, }
-      bytes += encode_wire_parameters([item], Little, limits=leaf_limits).length()
+      bytes += encode_wire_parameters_bounded(
+        [item],
+        Little,
+        limits,
+        budget,
+        maximum - bytes,
+      ).length()
       group.output.push(item)
     }
-    guard bytes <= limits.message_bytes else {
+    guard bytes <= maximum else {
       raise Limit(bytes, "JSON exceeds complete wire budget")
     }
   }
@@ -339,6 +367,10 @@ pub fn Message::to_typed_json(
   limits~ : Limits = Limits::default(),
   budget~ : TreeBudget = TreeBudget::default(),
 ) -> Json raise DltError {
+  check_limits(limits)
+  ignore(
+    finish_verbose_message(self.header, self.payload, self.storage, limits),
+  )
   {
     "format": "moondlt.verbose.v1",
     "storage": storage_json(self.storage),
@@ -358,16 +390,24 @@ pub fn Message::from_typed_json(
   limits~ : Limits = Limits::default(),
   budget~ : TreeBudget = TreeBudget::default(),
 ) -> Message raise DltError {
+  check_limits(limits)
   let o = verbose_object(json)
   verbose_fields(o, ["format", "storage", "header", "parameters"])
   guard verbose_string(verbose_field(o, "format")) == "moondlt.verbose.v1" else {
     raise Unsupported(0, "unknown verbose JSON format")
   }
-  let header = Header::from_json(verbose_field(o, "header"), limits~)
-  let parameters = wire_parameters_from_json(
+  // The original NOAR is display metadata. The edited list determines the
+  // outgoing count and must satisfy the caller's limit even if the old one did not.
+  let header = Header::from_json(verbose_field(o, "header"), limits={
+    ..limits,
+    arguments: 255,
+  })
+  ignore(verbose_data_header(header))
+  let parameters = wire_parameters_from_json_bounded(
     verbose_field(o, "parameters"),
-    limits~,
-    budget~,
+    limits,
+    budget,
+    limits.message_bytes - header.wire_size(),
   )
   match storage_from_json(verbose_field(o, "storage")) {
     Some(storage) =>

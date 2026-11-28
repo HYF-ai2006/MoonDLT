@@ -18,6 +18,8 @@ moon add HYF-ai2006/moondlt@0.1.0
 
 ## R19-11 复审版本
 
+[验收复现](docs/ACCEPTANCE.md)列出跨目标回归、离线控制宿主与独立新包消费者的命令和预期结果。
+
 GitHub 当前源码版本为 0.2.0。最终目标涵盖 R19-11 DLT v1 的标准报文与适用的可观察协议行为。当前源码提供嵌套 STRU、ASCII/UTF-8 TRAI、精确 128 位整数、binary16/binary128、128 位定点偏移及标准数值数组，包括编辑 JSON 后重建实际 Storage 文件。Classic ARXML 的定宽字段导入、标准控制载荷和宿主行为的阶段状态详见 [R19-11 条款与验收矩阵](docs/R19_11_REQUIREMENTS.md)。
 
 ```sh

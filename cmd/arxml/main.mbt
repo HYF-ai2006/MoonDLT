@@ -11,7 +11,11 @@ pub fn decode_arxml_record(
       "serial" => Serial
       _ => raise @dlt.Invalid(0, "unknown DLT framing")
     }
-    let parsed = @json.parse(metadata) catch {
+    let parsed = @json.parse(
+      metadata,
+      max_nesting_depth=16,
+      reject_duplicate_keys=true,
+    ) catch {
       _ => raise @dlt.Invalid(0, "malformed ARXML catalogue JSON")
     }
     let catalog = @dlt.ArxmlCatalog::from_json(parsed)

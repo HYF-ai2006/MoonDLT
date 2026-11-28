@@ -164,3 +164,30 @@ test "R19 control preflight distinguishes busy, deprecated, unknown and dispatch
   )
   assert_eq(r19_request_status(GetLogInfo(2, "", "", "")), 1)
 }
+
+///|
+test "application-assigned service capture keeps opaque bytes and exact length" {
+  for
+    (order, hex) in [
+      (Big, "00000fff000000026162"),
+      (Little, "ff0f0000020000006162"),
+    ] {
+    let bytes = hex_decode(hex)
+    let request = decode_control_request(bytes[:], order)
+    assert_eq(request.application_data(order), b"ab")
+    let cut = decode_control_request(bytes[:9], order)
+    assert_true(
+      try {
+        ignore(cut.application_data(order))
+        false
+      } catch {
+        Truncated(8, _) => true
+        _ => false
+      },
+    )
+    let rejected = ErrorStatus(1).response(request.service_id(), order)
+    assert_eq(rejected.interpret(order), ErrorStatus(1))
+    let pending = ErrorStatus(3).response(request.service_id(), order)
+    assert_eq(pending.interpret(order), ErrorStatus(3))
+  }
+}

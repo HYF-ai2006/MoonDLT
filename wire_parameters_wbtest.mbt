@@ -255,3 +255,124 @@ test "wide FIXP and multidimensional float arrays preserve types and bit pattern
     assert_eq(decode_wire_parameters(b[:], 3, endian), tree)
   }
 }
+
+///|
+test "message wire APIs reserve LEN header bytes and reject control envelopes" {
+  let header = review_header(Little)
+  let item = TraceInfo(Ascii, "")
+  let limit = { ..Limits::default(), message_bytes: 20, }
+  let message = Message::with_wire_parameters(header, [item])
+  assert_eq(message.header.wire_size() + message.payload.length(), 21)
+  assert_true(
+    try {
+      ignore(message.wire_parameters(limits=limit))
+      false
+    } catch {
+      Limit(2, _) => true
+      _ => false
+    },
+  )
+  assert_true(
+    try {
+      ignore(Message::with_wire_parameters(header, [item], limits=limit))
+      false
+    } catch {
+      Limit(_, _) => true
+      _ => false
+    },
+  )
+  let control_header = {
+    ..message.header,
+    extended: Some({
+      ..message.header.extended.unwrap(),
+      message_type: 3,
+      subtype: 2,
+    }),
+  }
+  let control = { ..message, header: control_header, }
+  assert_true(
+    try {
+      ignore(control.wire_parameters())
+      false
+    } catch {
+      Invalid(_, _) => true
+      _ => false
+    },
+  )
+  assert_true(
+    try {
+      ignore(Message::with_wire_parameters(control_header, [item]))
+      false
+    } catch {
+      Invalid(_, _) => true
+      _ => false
+    },
+  )
+}
+
+///|
+test "editing verbose JSON re-derives NOAR and allocates within the remaining frame" {
+  let message = Message::with_wire_parameters(review_header(Big), [
+    TraceInfo(Ascii, "first"),
+    TraceInfo(Ascii, "second"),
+  ])
+  let object = verbose_object(message.to_typed_json())
+  let parameters = verbose_array(verbose_field(object, "parameters"))
+  ignore(parameters.pop())
+  let edited = Json::object(object)
+  let frame_limit = { ..Limits::default(), arguments: 1, message_bytes: 26, }
+  let actual = Message::from_typed_json(edited, limits=frame_limit)
+  assert_eq(actual.header.extended.unwrap().argument_count, 1)
+  assert_eq(actual.wire_parameters(limits=frame_limit), [
+    TraceInfo(Ascii, "first"),
+  ])
+  assert_true(
+    try {
+      ignore(
+        Message::from_typed_json(edited, limits={
+          ..frame_limit,
+          message_bytes: 25,
+        }),
+      )
+      false
+    } catch {
+      Limit(_, _) => true
+      _ => false
+    },
+  )
+}
+
+///|
+test "numeric JSON array checks remaining wire bytes before decoding elements" {
+  let first = TraceInfo(Ascii, "")
+  let array : WireParameter = Numeric({
+    kind: UIntValue(32),
+    dimensions: [2],
+    elements: [{ high: 0UL, low: 1UL, }, { high: 0UL, low: 2UL, }],
+    variable: None,
+    scaling: None,
+  })
+  let message = Message::with_wire_parameters(review_header(Big), [first, array])
+  let exact = { ..Limits::default(), message_bytes: 37, }
+  let json = message.to_typed_json(limits=exact)
+  assert_eq(Message::from_typed_json(json, limits=exact), message)
+  let object = verbose_object(json)
+  let items = verbose_array(verbose_field(object, "parameters"))
+  let bad = verbose_object(items[1])
+  bad.set("values", Json::array([Json::string("malformed"), Json::string("2")]))
+  items[1] = Json::object(bad)
+  assert_true(
+    try {
+      ignore(
+        Message::from_typed_json(Json::object(object), limits={
+          ..exact,
+          message_bytes: 36,
+        }),
+      )
+      false
+    } catch {
+      Limit(7, _) => true
+      _ => false
+    },
+  )
+}

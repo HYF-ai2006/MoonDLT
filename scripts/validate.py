@@ -62,7 +62,7 @@ def write_summary(report: dict) -> None:
         f"核心源码：{core.get('physical', '未知')} 物理行，去除注释和空行后 {core.get('code_nonblank', '未知')} 行，"
         f"进一步去除纯结构符号后 **{core.get('effective_strict', '未知')} 严格有效行**。测试、示例、生成文件和依赖均未计入核心。",
         "", "复现：`python scripts/validate.py --release-tests`。机器记录见 `LOCAL_VALIDATION.json`，完整日志在忽略目录 `work/validation/`。",
-        "", "局限：高级 VARI/FIXP/数组未获得独立 pydlt 互操作证明；没有实车或量产日志语料；远程 CI 和发布状态见 `SUBMISSION_STATUS.md`。",
+        "", "对照工具的范围与实际用例见条款矩阵。验收使用标准合成记录和宿主重放。远程 CI 和发布状态见 `SUBMISSION_STATUS.md`。",
         "Windows 原生运行需要 MSVC C++ 编译环境与 SDK，未运行项不能视为通过。", "",
     ])
     (ROOT / "docs" / "LOCAL_VALIDATION.md").write_text(text, encoding="utf-8")
@@ -87,6 +87,7 @@ def main() -> None:
         ("seeded_interop", [sys.executable, "scripts/test_interop_random.py"]),
         ("file_cli", [sys.executable, "scripts/test_file_cli.py"]),
         ("arxml", [sys.executable, "scripts/test_arxml.py"]),
+        ("public_package", [sys.executable, "scripts/test_public_package.py"]),
         ("review_record", [sys.executable, "scripts/test_review_record.py"] + (["--rust"] if shutil.which("cargo") else [])),
     ]
     if arguments.release_tests:

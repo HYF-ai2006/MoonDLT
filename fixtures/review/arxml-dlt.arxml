@@ -9,6 +9,21 @@
           <BASE-TYPE-SIZE>128</BASE-TYPE-SIZE>
           <BASE-TYPE-ENCODING>NONE</BASE-TYPE-ENCODING>
         </SW-BASE-TYPE>
+        <COMPU-METHOD>
+          <SHORT-NAME>CounterOrigin</SHORT-NAME>
+          <CATEGORY>LINEAR</CATEGORY>
+          <UNIT-REF DEST="UNIT">/Units/Events</UNIT-REF>
+          <COMPU-INTERNAL-TO-PHYS>
+            <COMPU-SCALES>
+              <COMPU-SCALE>
+                <COMPU-RATIONAL-COEFFS>
+                  <COMPU-NUMERATOR><V>-158456325028528675187087900672</V><V>1</V></COMPU-NUMERATOR>
+                  <COMPU-DENOMINATOR><V>2</V></COMPU-DENOMINATOR>
+                </COMPU-RATIONAL-COEFFS>
+              </COMPU-SCALE>
+            </COMPU-SCALES>
+          </COMPU-INTERNAL-TO-PHYS>
+        </COMPU-METHOD>
         <DLT-MESSAGE-COLLECTION-SET>
           <SHORT-NAME>Logs</SHORT-NAME>
           <DLT-MESSAGES>
@@ -39,6 +54,7 @@
                     <SW-DATA-DEF-PROPS-VARIANTS>
                       <SW-DATA-DEF-PROPS-CONDITIONAL>
                         <BASE-TYPE-REF DEST="SW-BASE-TYPE">/Diagnostics/WideCounter</BASE-TYPE-REF>
+                        <COMPU-METHOD-REF DEST="COMPU-METHOD">/Diagnostics/CounterOrigin</COMPU-METHOD-REF>
                       </SW-DATA-DEF-PROPS-CONDITIONAL>
                     </SW-DATA-DEF-PROPS-VARIANTS>
                   </NETWORK-REPRESENTATION>

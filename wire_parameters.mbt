@@ -55,10 +55,10 @@ fn wire_number_word(kind : NumericType) -> (UInt32, Int32) raise DltError {
 fn wire_shape_count(
   dims : Array[Int32],
   bytes : Int32,
-  limits : Limits,
+  maximum : Int32,
   at : Int32,
 ) -> Int32 raise DltError {
-  guard dims.length() <= 65535 && dims.length() <= limits.message_bytes / 2 else {
+  guard dims.length() <= 65535 && dims.length() <= maximum / 2 else {
     raise Limit(at, "rank exceeds message budget")
   }
   let mut count = 1
@@ -66,7 +66,7 @@ fn wire_shape_count(
     guard dim > 0 && dim <= 65535 else {
       raise Invalid(at, "invalid array dimension")
     }
-    guard count <= limits.message_bytes / bytes / dim else {
+    guard count <= maximum / bytes / dim else {
       raise Limit(at, "array exceeds byte budget")
     }
     count *= dim
@@ -131,6 +131,10 @@ fn read_wire_numeric(
     0x80U if width != 8 => FloatValue(width)
     _ => raise Invalid(at, "incompatible numeric type flags")
   }
+  let scaled = (info & 0x1000U) != 0U
+  guard !scaled || wire_scalable(kind) else {
+    raise Invalid(at, "FIXP on noninteger")
+  }
   let mut pos = at + 4
   let dims : Array[Int32] = []
   let is_array = (info & 0x100U) != 0U
@@ -144,7 +148,7 @@ fn read_wire_numeric(
       pos += 2
     }
   }
-  let count = wire_shape_count(dims, width / 8, limits, at)
+  let count = wire_shape_count(dims, width / 8, limits.message_bytes, at)
   let variable = if (info & 0x800U) != 0U {
     let (v, next) = read_metadata(
       data,
@@ -158,8 +162,7 @@ fn read_wire_numeric(
   } else {
     None
   }
-  let scaling = if (info & 0x1000U) != 0U {
-    guard wire_scalable(kind) else { raise Invalid(at, "FIXP on noninteger") }
+  let scaling = if scaled {
     let ow = wire_offset_width(width)
     let q = read_u32(data, pos, endian)
     let offset = read_bits(data, pos + 4, ow, endian)
@@ -288,9 +291,11 @@ fn write_wire_numeric(
   n : WireNumeric,
   endian : Endian,
   limits : Limits,
+  maximum : Int32,
 ) -> Unit raise DltError {
   let (base, width) = wire_number_word(n.kind)
-  let count = wire_shape_count(n.dimensions, width / 8, limits, out.length())
+  let remaining = maximum - out.length()
+  let count = wire_shape_count(n.dimensions, width / 8, remaining, out.length())
   guard count == n.elements.length() else {
     raise Invalid(out.length(), "element count disagrees with shape")
   }
@@ -313,7 +318,7 @@ fn write_wire_numeric(
     word = word | 0x1000U
     size += 4 + ow / 8
   }
-  guard size <= limits.message_bytes - out.length() else {
+  guard size <= remaining else {
     raise Limit(out.length(), "numeric payload exceeds byte budget")
   }
   write_u32(out, word, endian)
@@ -359,8 +364,26 @@ pub fn encode_wire_parameters(
   limits~ : Limits = Limits::default(),
   budget~ : TreeBudget = TreeBudget::default(),
 ) -> Bytes raise DltError {
+  encode_wire_parameters_bounded(
+    items,
+    endian,
+    limits,
+    budget,
+    limits.message_bytes,
+  )
+}
+
+///|
+fn encode_wire_parameters_bounded(
+  items : Array[WireParameter],
+  endian : Endian,
+  limits : Limits,
+  budget : TreeBudget,
+  maximum : Int32,
+) -> Bytes raise DltError {
   check_limits(limits)
   check_tree_budget(budget)
+  guard maximum >= 0 else { raise Limit(2, "no room for verbose payload") }
   guard items.length() <= limits.arguments && items.length() <= budget.nodes else {
     raise Limit(0, "top-level parameter budget exceeded")
   }
@@ -380,7 +403,7 @@ pub fn encode_wire_parameters(
     }
     visited += 1
     match item {
-      Numeric(n) => write_wire_numeric(out, n, endian, limits)
+      Numeric(n) => write_wire_numeric(out, n, endian, limits, maximum)
       Structure(name, children) => {
         guard stack.length() <= budget.depth else {
           raise Limit(out.length(), "structure depth exceeded")
@@ -396,7 +419,7 @@ pub fn encode_wire_parameters(
           Some(v) => 6 + metadata_wire_length(v, false, limits)
           None => 6
         }
-        guard size <= limits.message_bytes - out.length() else {
+        guard size <= maximum - out.length() else {
           raise Limit(out.length(), "structure exceeds byte budget")
         }
         write_u32(out, if name is Some(_) { 0x4800U } else { 0x4000U }, endian)
@@ -408,7 +431,7 @@ pub fn encode_wire_parameters(
       }
       TraceInfo(coding, s) => {
         let bytes = argument_text_bytes(coding, s, limits)
-        guard 7 + bytes.length() <= limits.message_bytes - out.length() else {
+        guard 7 + bytes.length() <= maximum - out.length() else {
           raise Limit(out.length(), "trace info exceeds byte budget")
         }
         write_u32(out, if coding == Utf8 { 0xA000U } else { 0x2000U }, endian)
@@ -423,7 +446,7 @@ pub fn encode_wire_parameters(
           scaling: None,
         }
         let bytes = encode_one_parameter(p, endian, limits)
-        guard bytes.length() <= limits.message_bytes - out.length() else {
+        guard bytes.length() <= maximum - out.length() else {
           raise Limit(out.length(), "text exceeds byte budget")
         }
         out.write_bytes(bytes[:])
@@ -435,7 +458,7 @@ pub fn encode_wire_parameters(
           scaling: None,
         }
         let bytes = encode_one_parameter(p, endian, limits)
-        guard bytes.length() <= limits.message_bytes - out.length() else {
+        guard bytes.length() <= maximum - out.length() else {
           raise Limit(out.length(), "raw data exceeds byte budget")
         }
         out.write_bytes(bytes[:])
@@ -446,13 +469,26 @@ pub fn encode_wire_parameters(
 }
 
 ///|
+fn verbose_data_header(header : Header) -> ExtendedHeader raise DltError {
+  guard header.extended is Some(ext) &&
+    ext.verbose &&
+    ext.message_type >= 0 &&
+    ext.message_type <= 2 else {
+    raise Invalid(0, "expected a verbose data message")
+  }
+  ext
+}
+
+///|
 pub fn Message::wire_parameters(
   self : Message,
   limits~ : Limits = Limits::default(),
   budget~ : TreeBudget = TreeBudget::default(),
 ) -> Array[WireParameter] raise DltError {
-  guard self.header.extended is Some(ext) && ext.verbose else {
-    raise Invalid(0, "expected verbose message")
+  check_limits(limits)
+  let ext = verbose_data_header(self.header)
+  guard self.payload.length() <= limits.message_bytes - self.header.wire_size() else {
+    raise Limit(2, "DLT header and payload exceed message budget")
   }
   decode_wire_parameters(
     self.payload[:],
@@ -471,10 +507,15 @@ pub fn Message::with_wire_parameters(
   limits~ : Limits = Limits::default(),
   budget~ : TreeBudget = TreeBudget::default(),
 ) -> Message raise DltError {
-  guard header.extended is Some(ext) && ext.verbose else {
-    raise Invalid(0, "expected verbose header")
-  }
-  let payload = encode_wire_parameters(items, header.endian, limits~, budget~)
+  check_limits(limits)
+  let ext = verbose_data_header(header)
+  let payload = encode_wire_parameters_bounded(
+    items,
+    header.endian,
+    limits,
+    budget,
+    limits.message_bytes - header.wire_size(),
+  )
   let extended = Some({ ..ext, argument_count: items.length(), })
   finish_verbose_message({ ..header, extended, }, payload, storage, limits)
 }

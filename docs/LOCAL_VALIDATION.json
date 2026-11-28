@@ -1,5 +1,5 @@
 {
-  "recorded_at": "2026-11-28T13:29:14.160375+08:00",
+  "recorded_at": "2026-11-28T13:44:37.759471+08:00",
   "scope": "Local build, test and interoperability evidence; publication status is recorded separately in docs/SUBMISSION_STATUS.md",
   "platform": "Windows",
   "node": "v24.22.3",
@@ -39,8 +39,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 66,
-        "passed": 66,
+        "total": 76,
+        "passed": 76,
         "failed": 0
       }
     },
@@ -56,8 +56,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 66,
-        "passed": 66,
+        "total": 76,
+        "passed": 76,
         "failed": 0
       }
     },
@@ -73,8 +73,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 66,
-        "passed": 66,
+        "total": 76,
+        "passed": 76,
         "failed": 0
       }
     },
@@ -148,6 +148,15 @@
       "status": "PASS"
     },
     {
+      "name": "public_package",
+      "command": [
+        "C:\\Users\\11619\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "scripts/test_public_package.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
       "name": "review_record",
       "command": [
         "C:\\Users\\11619\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
@@ -170,8 +179,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 66,
-        "passed": 66,
+        "total": 76,
+        "passed": 76,
         "failed": 0
       }
     },
@@ -188,8 +197,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 66,
-        "passed": 66,
+        "total": 76,
+        "passed": 76,
         "failed": 0
       }
     },
@@ -211,28 +220,28 @@
     ],
     "totals": {
       "core": {
-        "physical": 8309,
-        "code_nonblank": 7366,
-        "effective_strict": 5783
+        "physical": 9216,
+        "code_nonblank": 8181,
+        "effective_strict": 6437
       },
       "tests": {
-        "physical": 2583,
-        "code_nonblank": 2448,
-        "effective_strict": 1887
+        "physical": 3087,
+        "code_nonblank": 2929,
+        "effective_strict": 2269
       },
       "examples_and_tools": {
-        "physical": 535,
-        "code_nonblank": 483,
-        "effective_strict": 376
+        "physical": 539,
+        "code_nonblank": 487,
+        "effective_strict": 380
       }
     },
     "files": {
       "core": [
         {
           "path": "arxml.mbt",
-          "physical": 422,
-          "code_nonblank": 388,
-          "effective_strict": 301
+          "physical": 557,
+          "code_nonblank": 518,
+          "effective_strict": 399
         },
         {
           "path": "bytes.mbt",
@@ -260,9 +269,9 @@
         },
         {
           "path": "control_details.mbt",
-          "physical": 493,
-          "code_nonblank": 450,
-          "effective_strict": 371
+          "physical": 531,
+          "code_nonblank": 484,
+          "effective_strict": 397
         },
         {
           "path": "dictionary.mbt",
@@ -283,10 +292,16 @@
           "effective_strict": 726
         },
         {
+          "path": "r19_host.mbt",
+          "physical": 633,
+          "code_nonblank": 562,
+          "effective_strict": 456
+        },
+        {
           "path": "r19_validation.mbt",
-          "physical": 73,
-          "code_nonblank": 67,
-          "effective_strict": 50
+          "physical": 93,
+          "code_nonblank": 83,
+          "effective_strict": 62
         },
         {
           "path": "source.mbt",
@@ -344,18 +359,24 @@
         },
         {
           "path": "wire_json.mbt",
-          "physical": 383,
-          "code_nonblank": 355,
-          "effective_strict": 276
+          "physical": 423,
+          "code_nonblank": 391,
+          "effective_strict": 306
         },
         {
           "path": "wire_parameters.mbt",
-          "physical": 480,
-          "code_nonblank": 439,
-          "effective_strict": 348
+          "physical": 521,
+          "code_nonblank": 476,
+          "effective_strict": 380
         }
       ],
       "tests": [
+        {
+          "path": "arxml_wbtest.mbt",
+          "physical": 67,
+          "code_nonblank": 66,
+          "effective_strict": 49
+        },
         {
           "path": "catalog_security_wbtest.mbt",
           "physical": 66,
@@ -376,9 +397,9 @@
         },
         {
           "path": "control_details_wbtest.mbt",
-          "physical": 166,
-          "code_nonblank": 157,
-          "effective_strict": 118
+          "physical": 193,
+          "code_nonblank": 182,
+          "effective_strict": 138
         },
         {
           "path": "expression_wbtest.mbt",
@@ -399,10 +420,16 @@
           "effective_strict": 294
         },
         {
+          "path": "r19_host_wbtest.mbt",
+          "physical": 246,
+          "code_nonblank": 236,
+          "effective_strict": 187
+        },
+        {
           "path": "r19_validation_wbtest.mbt",
-          "physical": 58,
-          "code_nonblank": 57,
-          "effective_strict": 43
+          "physical": 93,
+          "code_nonblank": 88,
+          "effective_strict": 69
         },
         {
           "path": "robustness_wbtest.mbt",
@@ -442,23 +469,23 @@
         },
         {
           "path": "utilities_regression_wbtest.mbt",
-          "physical": 126,
-          "code_nonblank": 119,
-          "effective_strict": 89
+          "physical": 134,
+          "code_nonblank": 127,
+          "effective_strict": 98
         },
         {
           "path": "wire_parameters_wbtest.mbt",
-          "physical": 257,
-          "code_nonblank": 246,
-          "effective_strict": 185
+          "physical": 378,
+          "code_nonblank": 361,
+          "effective_strict": 276
         }
       ],
       "examples_and_tools": [
         {
           "path": "cmd/arxml/main.mbt",
-          "physical": 25,
-          "code_nonblank": 24,
-          "effective_strict": 20
+          "physical": 29,
+          "code_nonblank": 28,
+          "effective_strict": 24
         },
         {
           "path": "cmd/demo/main.mbt",
