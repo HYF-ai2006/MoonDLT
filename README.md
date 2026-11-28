@@ -2,7 +2,7 @@
 
 MoonDLT 是以 MoonBit 实现的 **DLT v1 二进制日志编解码与流处理库**。它让运行在 Wasm、JavaScript 和原生环境中的工具读取 ECU 应用日志，提取带类型的参数，并将选中的记录按标准格式交给其他 DLT 工具。
 
-[GitHub CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml) · [Mooncakes 0.2.0](https://mooncakes.io/docs/HYF-ai2006/moondlt)
+[GitHub CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml) · [Mooncakes 模块](https://mooncakes.io/docs/HYF-ai2006/moondlt)
 
 核心面向已经产生的 `.dlt` 文件和 DLT 消息字节流，采用明确的长度、参数数目和缓存上限。读取器不依赖 libdlt、C/C++ FFI、车辆硬件或常驻守护进程。
 
@@ -11,8 +11,7 @@ MoonDLT 是以 MoonBit 实现的 **DLT v1 二进制日志编解码与流处理�
 添加依赖：
 
 ```sh
-moon update
-moon add HYF-ai2006/moondlt@0.2.0
+moon add HYF-ai2006/moondlt
 ```
 
 最近一次本地检查修复记录见 [2026-11-24 自查](docs/LOCAL_REVIEW_20261124.md)，逐项测试与规模数据见 [本地验证记录](docs/LOCAL_VALIDATION.md)。
@@ -21,7 +20,9 @@ moon add HYF-ai2006/moondlt@0.2.0
 
 [验收复现](docs/ACCEPTANCE.md)列出跨目标回归、离线控制宿主与独立新包消费者的命令和预期结果。
 
-0.2.0 已发布到 Mooncakes。最终目标涵盖 R19-11 DLT v1 的标准报文与适用的可观察协议行为。当前源码提供嵌套 STRU、ASCII/UTF-8 TRAI、精确 128 位整数、binary16/binary128、128 位定点偏移及标准数值数组，包括编辑 JSON 后重建实际 Storage 文件。Classic ARXML 的定宽字段导入、标准控制载荷和宿主行为的阶段状态详见 [R19-11 条款与验收矩阵](docs/R19_11_REQUIREMENTS.md)。
+安装命令会获取注册表中的最新稳定版。构建需要固定版本时，可在模块名后加 `@版本号`。
+
+复审版本以 0.2.0 的实现为基础。最终目标涵盖 R19-11 DLT v1 的标准报文与适用的可观察协议行为。当前源码提供嵌套 STRU、ASCII/UTF-8 TRAI、精确 128 位整数、binary16/binary128、128 位定点偏移及标准数值数组，包括编辑 JSON 后重建实际 Storage 文件。Classic ARXML 的定宽字段导入、标准控制载荷和宿主行为的阶段状态详见 [R19-11 条款与验收矩阵](docs/R19_11_REQUIREMENTS.md)。
 
 ```sh
 python scripts/test_review_record.py --rust

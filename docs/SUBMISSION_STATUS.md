@@ -1,8 +1,8 @@
 # 申报材料状态
 
-维护者为 [HYF-ai2006](https://github.com/HYF-ai2006)。当前送验版本为 `HYF-ai2006/moondlt@0.2.0`，2026-11-28 19:01（北京时间）发布，注册表构建成功。全新消费者从公共注册表分别在 Wasm 与 JS 编译运行，验证结构体中 trace-info 的编辑和 128 位值的精确重编码。 [Mooncakes 0.2.0](https://mooncakes.io/docs/HYF-ai2006/moondlt)
+维护者为 [HYF-ai2006](https://github.com/HYF-ai2006)。复审送验基线为 `HYF-ai2006/moondlt@0.2.0`，2026-11-28 19:01（北京时间）发布，注册表构建成功。全新消费者从公共注册表分别在 Wasm 与 JS 编译运行，验证结构体中 trace-info 的编辑和 128 位值的精确重编码。 [Mooncakes 0.2.0](https://mooncakes.io/docs/HYF-ai2006/moondlt)
 
-发布归档 SHA-256 为 `421c2de0b552e60b832115329e2dd9e4eb38b07da540c696092bf02adc61a995`，对应[通过 CI 的源代码提交](https://github.com/HYF-ai2006/MoonDLT/tree/1f03754b49923e95af9045d2b6b0e683c521c8c8)。GitHub 后续文档更新记录发布结果和安装方式。 [代码验收 CI](https://github.com/HYF-ai2006/MoonDLT/actions/runs/46113529267)
+0.2.0 发布归档 SHA-256 为 `421c2de0b552e60b832115329e2dd9e4eb38b07da540c696092bf02adc61a995`，对应[通过 CI 的源代码提交](https://github.com/HYF-ai2006/MoonDLT/tree/1f03754b49923e95af9045d2b6b0e683c521c8c8)。0.2.1 补丁更新安装说明、打包检查和 CI。公开版本列表见 [Mooncakes](https://mooncakes.io/docs/HYF-ai2006/moondlt)。 [代码验收 CI](https://github.com/HYF-ai2006/MoonDLT/actions/runs/46113529267)
 
 复现可运行 `moon update` 和 `python scripts/test_public_package.py --registry`。参赛材料链接为 [申报书](../PROPOSAL.md)、[验收复现](ACCEPTANCE.md) 和 [R19-11 条款矩阵](R19_11_REQUIREMENTS.md)。
 

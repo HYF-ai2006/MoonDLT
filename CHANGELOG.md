@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- 修正 Mooncakes 安装示例，默认安装当前稳定版本。可按需显式指定版本。
+- 打包检查校验 README 安装命令与模块版本，避免旧命令进入发布包。
+- GitHub CI 的 checkout、Node 和 Python 安装步骤改用 Node 24 运行，并固定到已核对的 Action 提交。
+
 ## 0.2.0 · 2026-11-28（Mooncakes 复审版本）
 
 - 新增 R19-11 结构体、trace-info、128 位整数和定点、binary16/binary128 与对应数组，支持 typed JSON 编辑。

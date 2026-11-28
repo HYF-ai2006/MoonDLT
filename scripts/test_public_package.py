@@ -48,10 +48,12 @@ def moon(directory: Path, *args: str) -> str:
 def fresh_consumer(root: Path, version: str, registry: bool) -> None:
     app = root / "consumer"
     app.mkdir()
-    (app / "moon.mod").write_text(
-        f'name = "local/moondlt_acceptance"\nversion = "0.0.0"\n'
-        f'import {{ "{MODULE}@{version}" }}\n', encoding="utf8",
-    )
+    config = 'name = "local/moondlt_acceptance"\nversion = "0.0.0"\n'
+    if not registry:
+        config += f'import {{ "{MODULE}@{version}" }}\n'
+    (app / "moon.mod").write_text(config, encoding="utf8")
+    if registry:
+        moon(app, "add", "--no-update", f"{MODULE}@{version}")
     (app / "moon.pkg").write_text(
         f'import {{ "{MODULE}" @dlt }}\npkgtype(kind: "executable")\n', encoding="utf8",
     )
@@ -61,6 +63,16 @@ def fresh_consumer(root: Path, version: str, registry: bool) -> None:
     for target in ("wasm", "js"):
         assert moon(app, "run", ".", "--target", target, "--deny-warn").strip() == EXPECTED, target
         print(f"PASS: fresh {'registry' if registry else 'archive'} consumer on {target}", flush=True)
+
+
+def check_install_document(readme: str, version: str) -> None:
+    modules = re.findall(r"(?m)^[ \t]*moon[ \t]+add[ \t]+(\S+)", readme)
+    examples = [m for m in modules if m == MODULE or m.startswith(f"{MODULE}@")]
+    if not examples:
+        raise ValueError(f"README is missing the install command: moon add {MODULE}")
+    for example in examples:
+        if example not in (MODULE, f"{MODULE}@{version}"):
+            raise ValueError(f"README install example {example} does not match {MODULE}@{version}")
 
 
 def main() -> None:
@@ -89,6 +101,7 @@ def main() -> None:
                     assert not path.is_absolute() and ".." not in path.parts
                     assert path.parts[0] not in {".git", "out", "work", "_build", ".mooncakes"}
                     assert packed.read(name) == (ROOT / path).read_bytes(), name
+                check_install_document(packed.read("README.md").decode("utf8"), version)
                 packed.extractall(fresh / "package")
             digest = hashlib.sha256(archive.read_bytes()).hexdigest()
             print(f"PASS: {archive.name}, {len(names)} files, SHA-256 {digest}", flush=True)

@@ -1,6 +1,6 @@
 name = "HYF-ai2006/moondlt"
 
-version = "0.2.0"
+version = "0.2.1"
 
 repository = "https://github.com/HYF-ai2006/MoonDLT"
 
