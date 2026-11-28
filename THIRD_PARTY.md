@@ -12,7 +12,7 @@ MoonDLT 的 MoonBit 核心代码为此工程新写，采用 Apache-2.0。协议�
 | [dlt_parse 0.10.1](https://github.com/JulianSchmid/dlt-parse-rs/tree/v0.10.1) | MIT OR Apache-2.0 | Rust 独立开发对照依赖，使用公开读写 API 核验小端共同用例。Rust 工具依赖 [arrayvec 0.7.6](https://github.com/bluss/arrayvec)（MIT OR Apache-2.0），核心 MoonBit 无此运行依赖。 |
 | MoonBit 标准库 | Apache-2.0 | 核心依赖工具链随附的 buffer、debug、UTF-8 等包，以 `moon.pkg` 实际导入为准。 |
 
-`fixtures/` 内的记录均是为本项目构造的公开合成值，由 pydlt 0.3.5 编码生成；不包含实际车辆日志、个人数据或商业资料。向量可通过 `scripts/interop.py --generate-fixtures` 复现，SHA-256 位于黄金 JSON。项目自有的向量定义、预期描述及脚本同样采用 Apache-2.0。外部工具的 MIT 许可不被改写成项目自有授权。
+`fixtures/` 内的记录均为合成输入。`pydlt-0.3.5-*` 由 pydlt 0.3.5 的公开 API 生成，可通过 `scripts/interop.py --generate-fixtures` 复现，SHA-256 位于黄金 JSON。`fixtures/review/` 是本项目按 R19-11 构造的 Storage 记录和 Classic ARXML 描述，用于复审场景。样例中使用的是合成设备、参数及源码位置。项目自有的向量定义、预期描述及脚本采用 Apache-2.0。
 
 AI 协助了选题检索、接口设计、代码生成、测试与文档。AI 输出不是协议权威来源；可核验事实来自标准、公开实现与本地命令。当前实现应由维护者逐项理解、审核和测试。未声明为成熟库的逐行移植，不把工具自动生成接口、测试数据或文档计入手写核心有效行。
 

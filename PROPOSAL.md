@@ -4,22 +4,24 @@
 
 **1、项目名称**　MoonDLT · 面向 Wasm 与原生工具的 AUTOSAR R19-11 DLT v1 日志交换库
 
-**2、项目简介**　以纯 MoonBit 实现车辆与嵌入式 DLT 日志交换。最终交付目标是完整实现 AUTOSAR FO R19-11 定义的 DLT v1 报文、标准载荷语义和适用的可观察协议行为。库为 Wasm、JS 和原生工具提供统一编解码、分片处理及原始记录导出接口。 [规范基准](https://www.autosar.org/fileadmin/standards/R19-11/FO/AUTOSAR_PRS_LogAndTraceProtocol.pdf)
+**2、项目简介**　车辆与嵌入式设备采集的 DLT 日志常包含嵌套状态、跟踪文本和宽计数器。MoonDLT 的纯 MoonBit 核心能读写 Storage、Network、Serial 三种封装，按记录边界处理分片，并提供筛选与无损导出。最终目标是完整实现 AUTOSAR FO R19-11 所规定的 DLT v1 报文、标准载荷和适用的协议行为。 [AUTOSAR 规范](https://www.autosar.org/fileadmin/standards/R19-11/FO/AUTOSAR_PRS_LogAndTraceProtocol.pdf)
 
-**3、方向与通用性**　可嵌入二进制协议库。调用方配置 ECU/APID/CTID、筛选和 non-verbose 外部描述，宿主提供读取、时钟和配置。CAN/DBC 处理总线信号，日志框架产生事件，MCAP 提供通用容器。MoonDLT 实现 DLT 自身的头部、类型词、有序参数及控制语义，并适用于离线诊断、测试交换与嵌入分析。 [生态差异说明](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/DIFFERENTIATION.md)
+**3、项目方向与通用性**　可嵌入的二进制协议库。文件读取和时钟由宿主提供，调用者可配置 ECU、应用、上下文及外部日志描述。同一核心可用于 Wasm、JS 和原生工具。与 CAN/DBC 的总线信号、日志框架的事件产生和 MCAP 的通用容器相比，MoonDLT 负责解释 DLT 记录头、参数类型与控制服务。 [生态差异说明](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/DIFFERENTIATION.md)
 
-**4、三个完整使用场景**
-- **故障诊断与交接。** 工程师输入 Storage 日志，用 ECU、应用和等级筛选并原样导出故障记录。解码快照结构中的 trace-info 和 128 位计数，修改一个成员后重新编码成可交接的 DLT 文件。验收比较筛选片段、修改字段和完整记录字节。
-- **Wasm 工具逐块分析。** 工具接收宿主分片送入的 DLT 字节，按记录边界取出嵌套参数，输出 JSON 给分析界面。验收逐字节输入与一次读取结果一致，保留宽整数及 IEEE 浮点位型，截断位置可定位。
-- **非 verbose 日志还原与联测。** 测试工程师提供 Classic ARXML 描述和无扩展头的 DLT 文件，从 Message ID 恢复应用上下文、源码位置、静态文字及动态测量值。验收大小端还原一致，缺少描述或匹配歧义明确报错，并用合成报文验证控制通知的解析结果。
+**4、三个预期使用场景**
+
+- **故障日志交接。** 诊断工程师输入 Storage 采集文件，按 ECU、应用和等级定位故障窗口，用 `inspect` 查看记录、用 `extract` 导出片段交给同事。验收以筛选结果正确、导出记录与源文件对应区间逐字节一致为准。
+- **离线工具分析分片。** Wasm 工具从宿主接收分块日志，逐帧解析后输出保留结构层次、宽整数和浮点位型的类型化 JSON，供界面或脚本读取。验收比较一次读取与逐字节送入的结果，要求记录顺序和字段值一致，截断输入返回可定位的错误。
+- **按模板还原台架日志。** 测试工程师输入 Classic ARXML 描述和无扩展头的 non-verbose DLT 记录，按 Message ID 恢复应用上下文、源码位置、静态文本和定宽动态值。验收要求大小端输入还原出相同字段，缺失或歧义匹配报错，修改动态值后可按原描述重新编码。
 
 **5、核心功能与阶段验收**
-- **第一阶段已实现。** 在已发布 0.1.0 的三种封装、分片与筛选能力上，增加嵌套 STRU、ASCII/UTF-8 TRAI、有符号及无符号 128 位、binary16/binary128、宽 FIXP、标准数值数组与可编辑 JSON。核心有效 MoonBit 代码为 6,437 行。大小端 Storage 样例解码出 `boot` 与精确的 `2⁹⁶＋1`，将文本改为 `ready` 后，载荷由 37 变 38 字节，计数原值保留。220 例按规范独立构造的组合覆盖双端序，`dlt_parse 0.10.1` 双向核对双方支持的小端高级类型。
-- **第二阶段已有实现与用例。** Classic ARXML 可从无扩展头记录恢复定宽字段、静态文本和可精确表示的线性定点，并按描述重新编码。标准控制入口覆盖保留位、NOAR、GetLogInfo 条件列表、通道状态、同步时间和溢出通知，已用字节向量核验。离线宿主已验证配置、应用通知、通道过滤、计数回绕、定时同步、溢出节流以及有限重试。
-- **最终验收。** 按 R19-11 第 5 章 161 个条款编号记录适用条件和证据。用现有跨目标 CI、离线宿主事件重放与独立包消费验证可复现性。复杂 ARXML 布局、GetLogInfo 状态 7 的额外外部对照与部署相关应用行为继续逐条验收。 [条款与验收矩阵](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/R19_11_REQUIREMENTS.md)
 
-**6、项目性质**　参考协议标准与现有开源实现的原创项目。MoonBit 核心自行编写，AI 辅助及数据来源已披露。项目采用 Apache-2.0。 [来源说明](https://github.com/HYF-ai2006/MoonDLT/blob/main/THIRD_PARTY.md)
+- **阶段一 · 标准载荷，已实现。** 支持嵌套结构体 STRU、ASCII/UTF-8 trace-info（TRAI）、有符号与无符号 128 位整数，并覆盖 binary16/binary128、宽定点和数组。大小端 Storage 样例均实测将结构体成员 `boot` 改为 `ready`，载荷从 37 增至 38 字节，整数 `2⁹⁶＋1` 保持精确。`python scripts/test_review_record.py --rust` 可复现该流程、220 个规范用例及与 Rust `dlt_parse 0.10.1` 共有小端高级类型的双向核对。
+- **阶段二 · 描述还原与控制行为，已验证基础能力。** Classic ARXML 路径支持字节对齐的定宽字段及可精确表示的单段线性定点。以字节向量核验控制请求字段和 GetLogInfo 列表响应。离线宿主用事件重放验证配置变更、应用通知、过滤、计数回绕、时间同步、溢出节流和有限重试。
+- **阶段三 · 最终验收。** 继续补齐复杂 ARXML 布局、验证 GetLogInfo 状态 7 的外部互操作，并在具体部署条件下核对端点行为。按 R19-11 第 5 章的适用条款逐项归档输入、预期字节或行为及复现结果。 [复现手册](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/ACCEPTANCE.md) · [R19-11 条款矩阵](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/R19_11_REQUIREMENTS.md)
 
-**7、参考项目与许可证**　协议和能力对照采用 COVESA dlt-daemon（MPL-2.0，按文件声明）、esrlabs/dlt-core（Apache-2.0）。验证依赖为 pydlt 0.3.5（MIT）和 dlt_parse 0.10.1（MIT OR Apache-2.0）。没有移植上游源码。 [来源、链接与使用范围](https://github.com/HYF-ai2006/MoonDLT/blob/main/THIRD_PARTY.md)
+**6、项目性质**　依据公开协议标准独立实现的原创 MoonBit 项目，以 Apache-2.0 发布。AI 辅助范围和测试数据来源已公开。 [许可证](https://github.com/HYF-ai2006/MoonDLT/blob/main/LICENSE) · [来源说明](https://github.com/HYF-ai2006/MoonDLT/blob/main/THIRD_PARTY.md)
 
-**8、仓库与提交**　公开仓库默认分支为 `main`。已有 10 次实质提交逐条列证，复审新增实现与回归测试可从后续提交和 CI 核查。 [GitHub 仓库](https://github.com/HYF-ai2006/MoonDLT) · [有效提交](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/SUBMISSION_REQUIREMENTS_CHECK.md) · [验收复现](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/ACCEPTANCE.md) · [GitHub CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml) · [Mooncakes 模块](https://mooncakes.io/docs/HYF-ai2006/moondlt)
+**7、参考项目与许可证**　[COVESA dlt-daemon](https://github.com/COVESA/dlt-daemon)（主要为 MPL-2.0，按文件声明）与 [esrlabs/dlt-core](https://github.com/esrlabs/dlt-core)（Apache-2.0）用于协议和能力对照。[pydlt 0.3.5](https://github.com/mikiepure/pydlt)（MIT）和 [dlt_parse 0.10.1](https://github.com/JulianSchmid/dlt-parse-rs/tree/v0.10.1)（MIT OR Apache-2.0）通过各自公开 API 提供独立互操作验证。
+
+**8、仓库与提交证据**　公开默认分支为 `main`，已有 10 次实质提交逐条列证。核心有效 MoonBit 代码为 6,437 行，Wasm、Wasm-GC、JS、Linux Native 各通过 76 项测试。0.2.0 为复审基线，Mooncakes 已发布 0.2.1 维护版，并通过 Wasm 和 JS 独立安装测试。 [GitHub 仓库](https://github.com/HYF-ai2006/MoonDLT) · [有效提交](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/SUBMISSION_REQUIREMENTS_CHECK.md) · [验证记录](https://github.com/HYF-ai2006/MoonDLT/actions/runs/46138504062) · [Mooncakes](https://mooncakes.io/docs/HYF-ai2006/moondlt)
