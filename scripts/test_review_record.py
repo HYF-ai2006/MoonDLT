@@ -45,6 +45,29 @@ def save_json(path: Path, doc: dict) -> None:
     path.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf8")
 
 
+def check_json_limits(directory: Path) -> None:
+    # Fit 128 structures and 5,000 leaves in a wire record. Its pretty JSON
+    # exceeds the editable model limit because each leaf is indented 128 levels.
+    top = struct.pack("<IH", 0x4000, 1) * 127
+    leaf = struct.pack("<IB", 0x11, 1)
+    body = top + struct.pack("<IH", 0x4000, 5000) + leaf * 5000
+    record, model = directory / "deep.dlt", directory / "deep.json"
+    record.write_bytes(storage(body, False))
+    cli("decode", record, model)
+    assert model.stat().st_size <= 8 * 1024 * 1024
+    rebuilt = directory / "rebuilt.dlt"
+    cli("encode", model, rebuilt)
+    assert rebuilt.read_bytes() == record.read_bytes()
+
+    duplicate = directory / "duplicate.json"
+    doc = json.loads(model.read_text(encoding="utf8"))
+    original = json.dumps(doc)
+    duplicate.write_text(original.replace('"format":', '"format":"wrong","format":', 1), encoding="utf8")
+    bad_output = directory / "duplicate.dlt"
+    cli("encode", duplicate, bad_output, success=False)
+    assert not bad_output.exists()
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--generate-fixtures", action="store_true")
@@ -81,6 +104,7 @@ def main() -> None:
             invalid = d / f"invalid-{label}.dlt"
             cli("encode", model, invalid, success=False)
             assert not invalid.exists()
+        check_json_limits(d)
         if options.rust:
             bridge = d / "bridge.bin"
             rust("emit", bridge)

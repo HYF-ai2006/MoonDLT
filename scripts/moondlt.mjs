@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const cli = path.join(root, '_build/js/debug/build/cmd/node/node.js');
+const maxModelBytes = 8 * 1024 * 1024;
 
 function usage() {
   throw new Error('Usage: node scripts/moondlt.mjs inspect INPUT [--filter EXPR] [--limit 100]\n       node scripts/moondlt.mjs extract INPUT OUTPUT [--filter EXPR]\n       node scripts/moondlt.mjs decode RECORD.dlt [MODEL.json]\n       node scripts/moondlt.mjs encode MODEL.json RECORD.dlt');
@@ -69,7 +70,7 @@ async function main() {
     if (initial.size > 0xffffffffffffffffn) throw new Error('Input size exceeds UInt64');
     if (settings.operation === 'decode' || settings.operation === 'encode') {
       const decoding = settings.operation === 'decode';
-      const budget = decoding ? 65551n : 8n * 1024n * 1024n;
+      const budget = decoding ? 65551n : BigInt(maxModelBytes);
       if (initial.size > budget) throw new Error('Single-record input exceeds its size limit');
       const input = Buffer.alloc(Number(initial.size));
       let bytesRead = 0;
@@ -83,7 +84,12 @@ async function main() {
       const report = JSON.parse(decoding ? library.decode_record(input) :
         library.encode_record(new TextDecoder('utf-8', { fatal: true }).decode(input)));
       if (!report.success) throw new Error(report.error);
-      const data = decoding ? JSON.stringify(report.message, null, 2) + '\n' : Buffer.from(report.hex, 'hex');
+      let data = decoding ? JSON.stringify(report.message, null, 2) + '\n' : Buffer.from(report.hex, 'hex');
+      if (decoding && Buffer.byteLength(data) > maxModelBytes) {
+        // Indentation alone can take a legal, deeply nested record over the
+        // encode command's JSON limit. Keep the output readable when it fits.
+        data = JSON.stringify(report.message) + '\n';
+      }
       if (settings.output) {
         outputFd = fs.openSync(settings.output, 'wx');
         createdOutput = true;

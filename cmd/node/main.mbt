@@ -153,7 +153,14 @@ pub fn decode_record(data : Bytes) -> String {
 
 ///|
 pub fn encode_record(text : String) -> String {
-  let doc = @json.parse(text) catch {
+  // Each structure accounts for an object and its members array, plus the
+  // message envelope and the variable/scaling objects of a leaf.
+  let json_depth = 2 * @dlt.TreeBudget::default().depth + 8
+  let doc = @json.parse(
+    text,
+    max_nesting_depth=json_depth,
+    reject_duplicate_keys=true,
+  ) catch {
     _ =>
       return Json::object({ "success": false, "error": "invalid JSON document" }).stringify()
   }
