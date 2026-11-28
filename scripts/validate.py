@@ -86,6 +86,7 @@ def main() -> None:
         ("independent_interop", [sys.executable, "scripts/interop.py"]),
         ("seeded_interop", [sys.executable, "scripts/test_interop_random.py"]),
         ("file_cli", [sys.executable, "scripts/test_file_cli.py"]),
+        ("arxml", [sys.executable, "scripts/test_arxml.py"]),
         ("review_record", [sys.executable, "scripts/test_review_record.py"] + (["--rust"] if shutil.which("cargo") else [])),
     ]
     if arguments.release_tests:
@@ -113,7 +114,7 @@ def main() -> None:
         "toolchain": toolchain.stdout.strip(), "checks": checks,
         "source_scale": json.loads(scale.stdout),
         "limitations": [
-            "Advanced VARI/FIXP/array types have standard-derived unit tests, not independent pydlt interoperability evidence",
+            "R19-11 advanced interoperability checks only the documented common subset with dlt_parse; local Rust execution requires cargo",
             "The 54 external vectors cover the common v1 scalar profile, not complete AUTOSAR certification",
             "No real vehicle hardware or production fleet log corpus was used",
             "Remote CI and registry publication are tracked separately in docs/SUBMISSION_STATUS.md",

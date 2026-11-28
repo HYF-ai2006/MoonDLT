@@ -1,6 +1,6 @@
 # 本地验证记录
 
-记录时间：2026-11-24T13:48:51.140037+08:00。结果：**PASS_WITH_LIMITATIONS**。
+记录时间：2026-11-28T13:29:14.160375+08:00。结果：**PASS_WITH_LIMITATIONS**。
 
 本文件由 `scripts/validate.py` 按实际执行结果生成。该脚本只记录本地检查，不执行远程推送、报名或发布。
 
@@ -8,20 +8,22 @@
 | --- | --- |
 | `format` | PASS |
 | `compile_all` | PASS |
-| `test_wasm` | PASS (56/56) |
-| `test_wasm_gc` | PASS (56/56) |
-| `test_js` | PASS (56/56) |
+| `test_wasm` | PASS (66/66) |
+| `test_wasm_gc` | PASS (66/66) |
+| `test_js` | PASS (66/66) |
 | `demo` | PASS |
 | `interfaces` | PASS |
 | `source_scale` | PASS |
 | `independent_interop` | PASS |
 | `seeded_interop` | PASS |
 | `file_cli` | PASS |
-| `test_release_wasm` | PASS (56/56) |
-| `test_release_js` | PASS (56/56) |
+| `arxml` | PASS |
+| `review_record` | PASS |
+| `test_release_wasm` | PASS (66/66) |
+| `test_release_js` | PASS (66/66) |
 | `test_native` | NOT_RUN: Windows MSVC C++ compiler/linker and SDK are unavailable in this environment |
 
-核心源码：6273 物理行，去除注释和空行后 5511 行，进一步去除纯结构符号后 **4315 严格有效行**。测试、示例、生成文件和依赖均未计入核心。
+核心源码：8309 物理行，去除注释和空行后 7366 行，进一步去除纯结构符号后 **5783 严格有效行**。测试、示例、生成文件和依赖均未计入核心。
 
 复现：`python scripts/validate.py --release-tests`。机器记录见 `LOCAL_VALIDATION.json`，完整日志在忽略目录 `work/validation/`。
 

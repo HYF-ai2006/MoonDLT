@@ -50,3 +50,5 @@ jobs:
         run: python scripts/test_file_cli.py
       - name: R19-11 typed Storage edit and independent Rust interoperability
         run: python scripts/test_review_record.py --rust
+      - name: R19-11 Classic ARXML to typed nonverbose Storage
+        run: python scripts/test_arxml.py

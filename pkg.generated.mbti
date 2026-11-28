@@ -57,6 +57,8 @@ pub fn hex_decode(String) -> Bytes raise DltError
 
 pub fn hex_encode(BytesView) -> String
 
+pub fn log_information_response(Array[ControlApplicationInfo], descriptions~ : Bool, Endian) -> ControlResponse raise DltError
+
 pub fn merge_messages(ArrayView[Array[Message]], maximum_messages? : Int32) -> Array[Message] raise DltError
 
 pub fn parse_framing(String) -> Framing raise DltError
@@ -64,6 +66,8 @@ pub fn parse_framing(String) -> Framing raise DltError
 pub fn query_expression(ArrayView[IndexEntry], FilterExpr, limit? : Int32, expression_limits? : ExpressionLimits) -> Array[IndexEntry] raise DltError
 
 pub fn query_index(ArrayView[IndexEntry], Filter, limit? : Int32) -> Array[IndexEntry] raise DltError
+
+pub fn r19_request_status(ControlRequest, busy? : Bool, valid_configuration? : Bool, filtering_supported? : Bool) -> Int32
 
 pub fn software_version_response(String, Endian) -> ControlResponse raise DltError
 
@@ -97,6 +101,46 @@ pub fn Argument::as_text(Self) -> String raise DltError
 pub fn Argument::as_uint64(Self) -> UInt64 raise DltError
 pub fn Argument::from_json(Json, limits? : Limits) -> Self raise DltError
 pub fn Argument::to_json(Self) -> Json
+
+pub struct ArxmlCatalog {
+  by_id : Map[UInt32, Array[ArxmlDescription]]
+  count : Int32
+}
+pub fn ArxmlCatalog::decode(Self, Message, limits? : Limits) -> ArxmlDecoded raise DltError
+pub fn ArxmlCatalog::from_json(Json) -> Self raise DltError
+pub fn ArxmlCatalog::length(Self) -> Int32
+pub fn ArxmlCatalog::new(Array[ArxmlDescription]) -> Self raise DltError
+
+pub(all) struct ArxmlDecoded {
+  description : ArxmlDescription
+  arguments : Array[WireParameter]
+} derive(Eq, @debug.Debug)
+pub fn ArxmlDecoded::to_json(Self) -> Json raise DltError
+
+pub(all) struct ArxmlDescription {
+  ecu : String?
+  application : String
+  context : String
+  message_id : UInt32
+  message_type : Int32
+  subtype : Int32
+  source_file : String?
+  source_line : UInt32?
+  fields : Array[ArxmlField]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ArxmlField {
+  name : String
+  unit_ref : String?
+  kind : ArxmlFieldType
+} derive(Eq, @debug.Debug)
+
+pub(all) enum ArxmlFieldType {
+  StaticText(String)
+  NumberField(NumericType)
+  TextField(TextEncoding, Int32)
+  OctetField(Int32)
+} derive(Eq, @debug.Debug)
 
 pub(all) struct ContinuityConfig {
   max_streams : Int32
@@ -137,6 +181,34 @@ pub fn ContinuityTracker::stream_count(Self) -> Int32
 pub fn ContinuityTracker::summaries(Self) -> Array[StreamSummary]
 pub fn ContinuityTracker::total_messages(Self) -> UInt64
 
+pub(all) struct ControlApplicationInfo {
+  id : String
+  contexts : Array[ControlContextInfo]
+  description : Bytes?
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ControlContextInfo {
+  id : String
+  level : Int32
+  trace : Bool
+  description : Bytes?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum ControlData {
+  Ack
+  ErrorStatus(Int32)
+  DefaultLogLevelValue(Int32)
+  TraceStatusValue(Bool)
+  LogChannels(Array[String])
+  LogChannelThreshold(Int32, Bool)
+  OverflowCount(UInt32)
+  SynchronizedTime(UInt64, UInt32)
+  SoftwareVersionValue(String)
+  LogInformation(Array[ControlApplicationInfo])
+  OpaqueControl(Bytes)
+} derive(Eq, @debug.Debug)
+pub fn ControlData::response(Self, UInt32, Endian, descriptions? : Bool) -> ControlResponse raise DltError
+
 pub(all) enum ControlRequest {
   SetLogLevel(String, String, Int32, String)
   SetTraceStatus(String, String, Int32, String)
@@ -147,9 +219,18 @@ pub(all) enum ControlRequest {
   SetDefaultLogLevel(Int32, String)
   SetDefaultTraceStatus(Int32, String)
   GetSoftwareVersion
+  SetMessageFiltering(Bool)
+  GetDefaultTraceStatus
+  GetLogChannelNames
+  GetTraceStatus(String, String)
+  SetLogChannelAssignment(String, String, String, Bool)
+  SetLogChannelThreshold(String, Int32, Bool)
+  GetLogChannelThreshold(String)
   Unknown(UInt32, Bytes)
 } derive(Eq, @debug.Debug)
+pub fn ControlRequest::canonical_bytes(Self, Endian) -> Bytes raise DltError
 pub fn ControlRequest::service_id(Self) -> UInt32
+pub fn ControlRequest::standard_message(Self, Header, storage? : StorageHeader, limits? : Limits) -> Message raise DltError
 
 pub(all) struct ControlResponse {
   service_id : UInt32
@@ -157,7 +238,9 @@ pub(all) struct ControlResponse {
   data : Bytes
 } derive(Eq, @debug.Debug)
 pub fn ControlResponse::default_log_level(Self) -> Int32 raise DltError
+pub fn ControlResponse::interpret(Self, Endian) -> ControlData raise DltError
 pub fn ControlResponse::software_version(Self, Endian, maximum_bytes? : Int32) -> String raise DltError
+pub fn ControlResponse::standard_message(Self, Header, storage? : StorageHeader, limits? : Limits) -> Message raise DltError
 
 pub(all) struct Decoded {
   message : Message
@@ -329,13 +412,17 @@ pub fn Message::new(Header, Bytes, storage? : StorageHeader) -> Self
 pub fn Message::nonverbose_id(Self) -> UInt32 raise DltError
 pub fn Message::parameters(Self, limits? : Limits) -> Array[VerboseParameter] raise DltError
 pub fn Message::schema_key(Self) -> SchemaKey raise DltError
+pub fn Message::standard_control_request(Self) -> ControlRequest raise DltError
+pub fn Message::standard_control_response(Self) -> ControlResponse raise DltError
 pub fn Message::storage_microseconds(Self) -> UInt64? raise DltError
 pub fn Message::stream_key(Self) -> StreamKey
 pub fn Message::to_json(Self) -> Json
 pub fn Message::to_typed_json(Self, limits? : Limits, budget? : TreeBudget) -> Json raise DltError
+pub fn Message::validate_r19(Self, limits? : Limits, budget? : TreeBudget) -> Unit raise DltError
 pub fn Message::wire_parameters(Self, limits? : Limits, budget? : TreeBudget) -> Array[WireParameter] raise DltError
 pub fn Message::with_arguments(Header, Array[Argument], storage? : StorageHeader, limits? : Limits) -> Self raise DltError
 pub fn Message::with_parameters(Header, Array[VerboseParameter], storage? : StorageHeader, limits? : Limits) -> Self raise DltError
+pub fn Message::with_reception(Self, seconds~ : UInt32, microseconds~ : UInt32, ecu~ : String, limits? : Limits) -> Self raise DltError
 pub fn Message::with_wire_parameters(Header, Array[WireParameter], storage? : StorageHeader, limits? : Limits, budget? : TreeBudget) -> Self raise DltError
 
 pub(all) struct NamedValue {

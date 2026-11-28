@@ -1,0 +1,10 @@
+import {
+  "HYF-ai2006/moondlt" @dlt,
+  "moonbitlang/core/json",
+}
+
+supported_targets = "js"
+
+options(
+  link: { "js": { "exports": [ "decode_arxml_record" ], "format": "esm" } },
+)

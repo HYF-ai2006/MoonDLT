@@ -1,5 +1,5 @@
 {
-  "recorded_at": "2026-11-24T13:48:51.140037+08:00",
+  "recorded_at": "2026-11-28T13:29:14.160375+08:00",
   "scope": "Local build, test and interoperability evidence; publication status is recorded separately in docs/SUBMISSION_STATUS.md",
   "platform": "Windows",
   "node": "v24.22.3",
@@ -39,8 +39,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 56,
-        "passed": 56,
+        "total": 66,
+        "passed": 66,
         "failed": 0
       }
     },
@@ -56,8 +56,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 56,
-        "passed": 56,
+        "total": 66,
+        "passed": 66,
         "failed": 0
       }
     },
@@ -73,8 +73,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 56,
-        "passed": 56,
+        "total": 66,
+        "passed": 66,
         "failed": 0
       }
     },
@@ -139,6 +139,25 @@
       "status": "PASS"
     },
     {
+      "name": "arxml",
+      "command": [
+        "C:\\Users\\11619\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "scripts/test_arxml.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "review_record",
+      "command": [
+        "C:\\Users\\11619\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+        "scripts/test_review_record.py",
+        "--rust"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
       "name": "test_release_wasm",
       "command": [
         "moon",
@@ -151,8 +170,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 56,
-        "passed": 56,
+        "total": 66,
+        "passed": 66,
         "failed": 0
       }
     },
@@ -169,8 +188,8 @@
       "exit_code": 0,
       "status": "PASS",
       "tests": {
-        "total": 56,
-        "passed": 56,
+        "total": 66,
+        "passed": 66,
         "failed": 0
       }
     },
@@ -192,23 +211,29 @@
     ],
     "totals": {
       "core": {
-        "physical": 6273,
-        "code_nonblank": 5511,
-        "effective_strict": 4315
+        "physical": 8309,
+        "code_nonblank": 7366,
+        "effective_strict": 5783
       },
       "tests": {
-        "physical": 2102,
-        "code_nonblank": 1988,
-        "effective_strict": 1541
+        "physical": 2583,
+        "code_nonblank": 2448,
+        "effective_strict": 1887
       },
       "examples_and_tools": {
-        "physical": 475,
-        "code_nonblank": 431,
-        "effective_strict": 333
+        "physical": 535,
+        "code_nonblank": 483,
+        "effective_strict": 376
       }
     },
     "files": {
       "core": [
+        {
+          "path": "arxml.mbt",
+          "physical": 422,
+          "code_nonblank": 388,
+          "effective_strict": 301
+        },
         {
           "path": "bytes.mbt",
           "physical": 230,
@@ -229,9 +254,15 @@
         },
         {
           "path": "control.mbt",
-          "physical": 396,
-          "code_nonblank": 348,
-          "effective_strict": 272
+          "physical": 474,
+          "code_nonblank": 426,
+          "effective_strict": 338
+        },
+        {
+          "path": "control_details.mbt",
+          "physical": 493,
+          "code_nonblank": 450,
+          "effective_strict": 371
         },
         {
           "path": "dictionary.mbt",
@@ -250,6 +281,12 @@
           "physical": 1015,
           "code_nonblank": 910,
           "effective_strict": 726
+        },
+        {
+          "path": "r19_validation.mbt",
+          "physical": 73,
+          "code_nonblank": 67,
+          "effective_strict": 50
         },
         {
           "path": "source.mbt",
@@ -277,9 +314,9 @@
         },
         {
           "path": "verbose.mbt",
-          "physical": 448,
-          "code_nonblank": 404,
-          "effective_strict": 314
+          "physical": 406,
+          "code_nonblank": 362,
+          "effective_strict": 280
         },
         {
           "path": "verbose_json.mbt",
@@ -289,15 +326,33 @@
         },
         {
           "path": "verbose_parameters.mbt",
-          "physical": 651,
-          "code_nonblank": 581,
-          "effective_strict": 463
+          "physical": 587,
+          "code_nonblank": 519,
+          "effective_strict": 406
         },
         {
           "path": "verbose_selection.mbt",
           "physical": 234,
           "code_nonblank": 206,
           "effective_strict": 154
+        },
+        {
+          "path": "wide_number.mbt",
+          "physical": 213,
+          "code_nonblank": 182,
+          "effective_strict": 147
+        },
+        {
+          "path": "wire_json.mbt",
+          "physical": 383,
+          "code_nonblank": 355,
+          "effective_strict": 276
+        },
+        {
+          "path": "wire_parameters.mbt",
+          "physical": 480,
+          "code_nonblank": 439,
+          "effective_strict": 348
         }
       ],
       "tests": [
@@ -320,6 +375,12 @@
           "effective_strict": 145
         },
         {
+          "path": "control_details_wbtest.mbt",
+          "physical": 166,
+          "code_nonblank": 157,
+          "effective_strict": 118
+        },
+        {
           "path": "expression_wbtest.mbt",
           "physical": 104,
           "code_nonblank": 99,
@@ -336,6 +397,12 @@
           "physical": 401,
           "code_nonblank": 384,
           "effective_strict": 294
+        },
+        {
+          "path": "r19_validation_wbtest.mbt",
+          "physical": 58,
+          "code_nonblank": 57,
+          "effective_strict": 43
         },
         {
           "path": "robustness_wbtest.mbt",
@@ -378,9 +445,21 @@
           "physical": 126,
           "code_nonblank": 119,
           "effective_strict": 89
+        },
+        {
+          "path": "wire_parameters_wbtest.mbt",
+          "physical": 257,
+          "code_nonblank": 246,
+          "effective_strict": 185
         }
       ],
       "examples_and_tools": [
+        {
+          "path": "cmd/arxml/main.mbt",
+          "physical": 25,
+          "code_nonblank": 24,
+          "effective_strict": 20
+        },
         {
           "path": "cmd/demo/main.mbt",
           "physical": 69,
@@ -395,15 +474,15 @@
         },
         {
           "path": "cmd/node/main.mbt",
-          "physical": 140,
-          "code_nonblank": 117,
-          "effective_strict": 91
+          "physical": 175,
+          "code_nonblank": 145,
+          "effective_strict": 114
         }
       ]
     }
   },
   "limitations": [
-    "Advanced VARI/FIXP/array types have standard-derived unit tests, not independent pydlt interoperability evidence",
+    "R19-11 advanced interoperability checks only the documented common subset with dlt_parse; local Rust execution requires cargo",
     "The 54 external vectors cover the common v1 scalar profile, not complete AUTOSAR certification",
     "No real vehicle hardware or production fleet log corpus was used",
     "Remote CI and registry publication are tracked separately in docs/SUBMISSION_STATUS.md"

@@ -9,6 +9,7 @@ MoonDLT 的 MoonBit 核心代码为此工程新写，采用 Apache-2.0。协议�
 | [esrlabs/dlt-core](https://github.com/esrlabs/dlt-core) | Apache-2.0 | 设计与成熟能力范围对照，未全量移植或复制源码。 |
 | [JulianSchmid/dlt-parse-rs](https://github.com/JulianSchmid/dlt-parse-rs) | MIT/Apache-2.0 | 用于了解可嵌入 DLT 库的职责与部署限制，未复制源码。 |
 | [pydlt 0.3.5](https://github.com/mikiepure/pydlt) | MIT，Copyright (c) 2018 Miki, Hiromitsu | 独立开发验证依赖，安装于忽略的 `work/pydeps`；通过公共 API 生成测试向量，不复制其编解码器到 MoonBit。 |
+| [dlt_parse 0.10.1](https://github.com/JulianSchmid/dlt-parse-rs/tree/v0.10.1) | MIT OR Apache-2.0 | Rust 独立开发对照依赖，使用公开读写 API 核验小端共同用例。Rust 工具依赖 [arrayvec 0.7.6](https://github.com/bluss/arrayvec)（MIT OR Apache-2.0），核心 MoonBit 无此运行依赖。 |
 | MoonBit 标准库 | Apache-2.0 | 核心依赖工具链随附的 buffer、debug、UTF-8 等包，以 `moon.pkg` 实际导入为准。 |
 
 `fixtures/` 内的记录均是为本项目构造的公开合成值，由 pydlt 0.3.5 编码生成；不包含实际车辆日志、个人数据或商业资料。向量可通过 `scripts/interop.py --generate-fixtures` 复现，SHA-256 位于黄金 JSON。项目自有的向量定义、预期描述及脚本同样采用 Apache-2.0。外部工具的 MIT 许可不被改写成项目自有授权。

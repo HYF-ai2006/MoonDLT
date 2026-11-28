@@ -16,6 +16,22 @@ moon add HYF-ai2006/moondlt@0.1.0
 
 最近一次本地检查修复记录见 [2026-11-24 自查](docs/LOCAL_REVIEW_20261124.md)，逐项测试与规模数据见 [本地验证记录](docs/LOCAL_VALIDATION.md)。
 
+## R19-11 复审版本
+
+GitHub 当前源码版本为 0.2.0。最终目标涵盖 R19-11 DLT v1 的标准报文与适用的可观察协议行为。当前源码提供嵌套 STRU、ASCII/UTF-8 TRAI、精确 128 位整数、binary16/binary128、128 位定点偏移及标准数值数组，包括编辑 JSON 后重建实际 Storage 文件。Classic ARXML 的定宽字段导入、标准控制载荷和宿主行为的阶段状态详见 [R19-11 条款与验收矩阵](docs/R19_11_REQUIREMENTS.md)。
+
+```sh
+python scripts/test_review_record.py --rust
+python scripts/test_arxml.py
+```
+
+也可直接查看样例的参数，修改 JSON 后编码回新文件。记录中有 `boot` 和十进制字符串 `79228162514264337593543950337`。命令只读写单条 Storage 记录。
+
+```sh
+node scripts/moondlt.mjs decode fixtures/review/fault-le.dlt out/fault.json
+node scripts/moondlt.mjs encode out/fault.json out/new-fault.dlt
+```
+
 ## 能处理什么
 
 - DLT v1 标准头、ECU/session/timestamp 可选字段、扩展头和小端/大端载荷。
@@ -27,9 +43,9 @@ moon add HYF-ai2006/moondlt@0.1.0
 - 应用显式注册的 nonverbose 固定布局字典；未注册载荷仍可按原样转交。
 - 使用 UInt64 偏移和宿主 `read_at` 回调扫描大型记录，只读取头或所选载荷；有界窗口缓存、计数器连续性和时间分桶可按需使用。
 - 可保存为 JSON 的 `SourceCatalog` 元数据侧文件；默认 `open` 重新核对全部记录头，再用于查询。
-- 常用控制服务的被动编解码；函数不建立连接或向设备发送命令。
+- 标准控制服务报文编解码、GetLogInfo 列表解释和离线状态判断。宿主提供应用状态及传输。
 
-详细范围与限制以 [兼容性清单](docs/COMPATIBILITY.md) 和生成接口 `pkg.generated.mbti` 为准。项目定位是 DLT v1 常用互操作子集，不宣称通过 AUTOSAR 全协议认证，也不实现 DLT v2、完整 FIBEX XML 或车载诊断服务栈。
+详细范围与限制以 [兼容性清单](docs/COMPATIBILITY.md) 和生成接口 `pkg.generated.mbti` 为准。项目按 R19-11 推进 DLT v1 的标准条款验收。进度和待验收行为按上述矩阵记录。
 
 ## 本地运行
 

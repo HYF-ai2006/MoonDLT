@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0">
+  <AR-PACKAGES>
+    <AR-PACKAGE>
+      <SHORT-NAME>Diagnostics</SHORT-NAME>
+      <ELEMENTS>
+        <SW-BASE-TYPE>
+          <SHORT-NAME>WideCounter</SHORT-NAME>
+          <BASE-TYPE-SIZE>128</BASE-TYPE-SIZE>
+          <BASE-TYPE-ENCODING>NONE</BASE-TYPE-ENCODING>
+        </SW-BASE-TYPE>
+        <DLT-MESSAGE-COLLECTION-SET>
+          <SHORT-NAME>Logs</SHORT-NAME>
+          <DLT-MESSAGES>
+            <DLT-MESSAGE>
+              <SHORT-NAME>VoltageDrop</SHORT-NAME>
+              <DLT-ARGUMENTS>
+                <DLT-ARGUMENT>
+                  <SHORT-NAME>headline</SHORT-NAME>
+                  <DESC><L-2 L="EN">Voltage dropped</L-2></DESC>
+                  <LENGTH>0</LENGTH>
+                </DLT-ARGUMENT>
+                <DLT-ARGUMENT>
+                  <SHORT-NAME>millivolts</SHORT-NAME>
+                  <LENGTH>16</LENGTH>
+                  <NETWORK-REPRESENTATION>
+                    <SW-DATA-DEF-PROPS-VARIANTS>
+                      <SW-DATA-DEF-PROPS-CONDITIONAL>
+                        <BASE-TYPE-REF DEST="SW-BASE-TYPE">/AUTOSAR_Platform/BaseTypes/uint16</BASE-TYPE-REF>
+                        <UNIT-REF DEST="UNIT">/Units/mV</UNIT-REF>
+                      </SW-DATA-DEF-PROPS-CONDITIONAL>
+                    </SW-DATA-DEF-PROPS-VARIANTS>
+                  </NETWORK-REPRESENTATION>
+                </DLT-ARGUMENT>
+                <DLT-ARGUMENT>
+                  <SHORT-NAME>event_count</SHORT-NAME>
+                  <LENGTH>128</LENGTH>
+                  <NETWORK-REPRESENTATION>
+                    <SW-DATA-DEF-PROPS-VARIANTS>
+                      <SW-DATA-DEF-PROPS-CONDITIONAL>
+                        <BASE-TYPE-REF DEST="SW-BASE-TYPE">/Diagnostics/WideCounter</BASE-TYPE-REF>
+                      </SW-DATA-DEF-PROPS-CONDITIONAL>
+                    </SW-DATA-DEF-PROPS-VARIANTS>
+                  </NETWORK-REPRESENTATION>
+                </DLT-ARGUMENT>
+              </DLT-ARGUMENTS>
+              <MESSAGE-ID>0x12345678</MESSAGE-ID>
+              <MESSAGE-LINE-NUMBER>27</MESSAGE-LINE-NUMBER>
+              <MESSAGE-SOURCE-FILE>power_monitor.c</MESSAGE-SOURCE-FILE>
+              <MESSAGE-TYPE-INFO>DLT_LOG_WARN</MESSAGE-TYPE-INFO>
+            </DLT-MESSAGE>
+          </DLT-MESSAGES>
+        </DLT-MESSAGE-COLLECTION-SET>
+        <ECU-INSTANCE>
+          <SHORT-NAME>PowerUnit</SHORT-NAME>
+          <DLT-CONFIG>
+            <DLT-ECU-ID>PWR1</DLT-ECU-ID>
+            <DLT-LOG-CHANNELS>
+              <DLT-LOG-CHANNEL>
+                <SHORT-NAME>PowerMonitor</SHORT-NAME>
+                <APPLICATION-ID>POWR</APPLICATION-ID>
+                <CONTEXT-ID>VOLT</CONTEXT-ID>
+                <DLT-MESSAGE-REFS>
+                  <DLT-MESSAGE-REF DEST="DLT-MESSAGE">/Diagnostics/Logs/VoltageDrop</DLT-MESSAGE-REF>
+                </DLT-MESSAGE-REFS>
+              </DLT-LOG-CHANNEL>
+            </DLT-LOG-CHANNELS>
+          </DLT-CONFIG>
+        </ECU-INSTANCE>
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+</AUTOSAR>

@@ -13,6 +13,13 @@ pub(all) enum ControlRequest {
   SetDefaultLogLevel(Int32, String)
   SetDefaultTraceStatus(Int32, String)
   GetSoftwareVersion
+  SetMessageFiltering(Bool)
+  GetDefaultTraceStatus
+  GetLogChannelNames
+  GetTraceStatus(String, String)
+  SetLogChannelAssignment(String, String, String, Bool)
+  SetLogChannelThreshold(String, Int32, Bool)
+  GetLogChannelThreshold(String)
   Unknown(UInt32, Bytes)
 } derive(Eq, @debug.Debug)
 
@@ -35,6 +42,13 @@ pub fn ControlRequest::service_id(self : ControlRequest) -> UInt32 {
     SetDefaultLogLevel(_, _) => 17U
     SetDefaultTraceStatus(_, _) => 18U
     GetSoftwareVersion => 19U
+    SetMessageFiltering(_) => 10U
+    GetDefaultTraceStatus => 21U
+    GetLogChannelNames => 23U
+    GetTraceStatus(_, _) => 31U
+    SetLogChannelAssignment(_, _, _, _) => 32U
+    SetLogChannelThreshold(_, _, _) => 33U
+    GetLogChannelThreshold(_) => 34U
     Unknown(id, _) => id
   }
 }
@@ -123,7 +137,28 @@ pub fn encode_control_request(
     GetDefaultLogLevel
     | StoreConfiguration
     | ResetConfiguration
-    | GetSoftwareVersion => ()
+    | GetSoftwareVersion
+    | GetDefaultTraceStatus
+    | GetLogChannelNames => ()
+    SetMessageFiltering(on) =>
+      out.write_byte(if on { b'\x01' } else { b'\x00' })
+    GetTraceStatus(apid, ctid) => {
+      write_id(out, apid)
+      write_id(out, ctid)
+    }
+    SetLogChannelAssignment(apid, ctid, channel, add) => {
+      write_id(out, apid)
+      write_id(out, ctid)
+      write_id(out, channel)
+      out.write_byte(if add { b'\x01' } else { b'\x00' })
+    }
+    SetLogChannelThreshold(channel, level, trace) => {
+      control_default_level(level, false)
+      write_id(out, channel)
+      out.write_byte(level.to_byte())
+      out.write_byte(if trace { b'\x01' } else { b'\x00' })
+    }
+    GetLogChannelThreshold(channel) => write_id(out, channel)
     Unknown(id, bytes) => {
       guard id != 1U &&
         id != 2U &&
@@ -133,7 +168,11 @@ pub fn encode_control_request(
         id != 6U &&
         id != 17U &&
         id != 18U &&
-        id != 19U else {
+        id != 19U &&
+        id != 10U &&
+        id != 21U &&
+        id != 23U &&
+        (id < 31U || id > 34U) else {
         raise Invalid(
           0, "known control service requires its typed request variant",
         )
@@ -206,6 +245,45 @@ pub fn decode_control_request(
     19U => {
       control_exact(data, 4)
       GetSoftwareVersion
+    }
+    10U => {
+      control_exact(data, 5)
+      SetMessageFiltering(read_control_flag(data, 4))
+    }
+    21U => {
+      control_exact(data, 4)
+      GetDefaultTraceStatus
+    }
+    23U => {
+      control_exact(data, 4)
+      GetLogChannelNames
+    }
+    31U => {
+      control_exact(data, 12)
+      GetTraceStatus(read_id(data, 4), read_id(data, 8))
+    }
+    32U => {
+      control_exact(data, 17)
+      SetLogChannelAssignment(
+        read_id(data, 4),
+        read_id(data, 8),
+        read_id(data, 12),
+        read_control_flag(data, 16),
+      )
+    }
+    33U => {
+      control_exact(data, 10)
+      let level = data[8].to_int()
+      control_default_level(level, false)
+      SetLogChannelThreshold(
+        read_id(data, 4),
+        level,
+        read_control_flag(data, 9),
+      )
+    }
+    34U => {
+      control_exact(data, 8)
+      GetLogChannelThreshold(read_id(data, 4))
     }
     _ => Unknown(id, data[4:].to_owned())
   }
@@ -362,7 +440,7 @@ fn control_header(header : Header, subtype : Int32) -> Header {
       verbose: false,
       message_type: 3,
       subtype,
-      argument_count: 1,
+      argument_count: 0,
       application,
       context,
     }),
