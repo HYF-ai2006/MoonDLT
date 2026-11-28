@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 · 2026-11-28（GitHub 复审源码）
+## 0.2.0 · 2026-11-28（Mooncakes 复审版本）
 
 - 新增 R19-11 结构体、trace-info、128 位整数和定点、binary16/binary128 与对应数组，支持 typed JSON 编辑。
 - Classic ARXML 定宽描述导入可从无扩展头记录重建参数与元数据。

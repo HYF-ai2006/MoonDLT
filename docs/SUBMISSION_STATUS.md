@@ -1,10 +1,10 @@
 # 申报材料状态
 
-2026-11-24：用户已授权将 `D:\CodexProjects\MoonDLT` 发布至 GitHub 与 Mooncakes。目标仓库为 [HYF-ai2006/MoonDLT](https://github.com/HYF-ai2006/MoonDLT)，包名为 `HYF-ai2006/moondlt`。
+维护者为 [HYF-ai2006](https://github.com/HYF-ai2006)。当前送验版本为 `HYF-ai2006/moondlt@0.2.0`，2026-11-28 19:01（北京时间）发布，注册表构建成功。全新消费者从公共注册表分别在 Wasm 与 JS 编译运行，验证结构体中 trace-info 的编辑和 128 位值的精确重编码。 [Mooncakes 0.2.0](https://mooncakes.io/docs/HYF-ai2006/moondlt)
 
-2026-11-28 复审：GitHub 源码 0.2.0 增加三项评审指出的标准载荷和实际文件复现。参赛评审以 GitHub main、[申报书](../PROPOSAL.md)、[条款矩阵](R19_11_REQUIREMENTS.md)及[当前 CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml)为依据。Mooncakes 的已发布基础版为 0.1.0。
+发布归档 SHA-256 为 `421c2de0b552e60b832115329e2dd9e4eb38b07da540c696092bf02adc61a995`，对应[通过 CI 的源代码提交](https://github.com/HYF-ai2006/MoonDLT/tree/1f03754b49923e95af9045d2b6b0e683c521c8c8)。GitHub 后续文档更新记录发布结果和安装方式。 [代码验收 CI](https://github.com/HYF-ai2006/MoonDLT/actions/runs/46113529267)
 
-本轮验收复现入口见 [ACCEPTANCE.md](ACCEPTANCE.md)。源码可构建 Mooncakes 0.2.0 ZIP，并支持从归档安装后的独立运行核对。实际注册表版本以 Mooncakes 为准。
+复现可运行 `moon update` 和 `python scripts/test_public_package.py --registry`。参赛材料链接为 [申报书](../PROPOSAL.md)、[验收复现](ACCEPTANCE.md) 和 [R19-11 条款矩阵](R19_11_REQUIREMENTS.md)。
 
 基础版发布记录：
 

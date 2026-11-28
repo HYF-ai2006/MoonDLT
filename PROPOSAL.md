@@ -22,4 +22,4 @@
 
 **7、参考项目与许可证**　协议和能力对照采用 COVESA dlt-daemon（MPL-2.0，按文件声明）、esrlabs/dlt-core（Apache-2.0）。验证依赖为 pydlt 0.3.5（MIT）和 dlt_parse 0.10.1（MIT OR Apache-2.0）。没有移植上游源码。 [来源、链接与使用范围](https://github.com/HYF-ai2006/MoonDLT/blob/main/THIRD_PARTY.md)
 
-**8、仓库与提交**　公开仓库默认分支为 `main`。已有 10 次实质提交逐条列证，复审新增实现与回归测试可从后续提交和 CI 核查。 [GitHub 仓库](https://github.com/HYF-ai2006/MoonDLT) · [有效提交](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/SUBMISSION_REQUIREMENTS_CHECK.md) · [验收复现](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/ACCEPTANCE.md) · [GitHub CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml) · [Mooncakes 已发布基础版 0.1.0](https://mooncakes.io/docs/HYF-ai2006/moondlt)
+**8、仓库与提交**　公开仓库默认分支为 `main`。已有 10 次实质提交逐条列证，复审新增实现与回归测试可从后续提交和 CI 核查。 [GitHub 仓库](https://github.com/HYF-ai2006/MoonDLT) · [有效提交](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/SUBMISSION_REQUIREMENTS_CHECK.md) · [验收复现](https://github.com/HYF-ai2006/MoonDLT/blob/main/docs/ACCEPTANCE.md) · [GitHub CI](https://github.com/HYF-ai2006/MoonDLT/actions/workflows/check.yml) · [Mooncakes 0.2.0](https://mooncakes.io/docs/HYF-ai2006/moondlt)
